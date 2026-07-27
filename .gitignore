@@ -6,6 +6,16 @@
 .env.*
 *.local
 
+# Local agent tooling. Reinstallable via `npx impeccable install`, so it is not
+# vendored into this public repo. Note: *.local above does NOT match
+# settings.local.json, so .claude/ is listed explicitly.
+.claude/
+.impeccable/
+
+# Impeccable product context. Internal positioning and sales strategy, and this
+# repo is public. Unignore it if you want it versioned.
+PRODUCT.md
+
 # Editor / OS
 .DS_Store
 Thumbs.db
@@ -16,3 +26,6 @@ desktop.ini
 # Logs
 *.log
 npm-debug.log*
+
+# Local dev tweak panel (canonical copy: C:/Projects/scripts/tweaks-panel.js)
+tweaks-panel.js
