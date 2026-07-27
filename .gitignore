@@ -6,6 +6,12 @@
 .env.*
 *.local
 
+# Local agent tooling. Reinstallable via `npx impeccable install`, so it is not
+# vendored into this public repo. Note: *.local above does NOT match
+# settings.local.json, so .claude/ is listed explicitly.
+.claude/
+.impeccable/
+
 # Editor / OS
 .DS_Store
 Thumbs.db
