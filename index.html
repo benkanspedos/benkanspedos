@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ben Kanspedos · Applied AI Consulting · Essential Concepts LLC</title>
+<meta name="description" content="Companies have AI now and little to show for it. I find where it actually pays off, build the workflows, and make them stick. Applied AI consulting by Ben Kanspedos, Essential Concepts LLC, Tucson AZ.">
+<meta property="og:title" content="Ben Kanspedos · Applied AI Consulting">
+<meta property="og:description" content="I find where AI actually pays off, build the workflows, and make them stick.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://benkanspedos.com/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2335573C'/%3E%3Ccircle cx='16' cy='8' r='2.6' fill='%23F1F2EC'/%3E%3Ccircle cx='16' cy='16' r='2.6' fill='%23F1F2EC'/%3E%3Ccircle cx='16' cy='24' r='2.6' fill='%23B4552B'/%3E%3Cpath d='M16 10.6v2.8m0 5.2v2.8' stroke='%23F1F2EC' stroke-width='1.4'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F1F2EC;
+  --ink:#212A20;
+  --green:#35573C;
+  --green-deep:#27402C;
+  --clay:#B4552B;
+  --mist:#DFE2D5;
+  --faint:#5C6659;
+  --max:72rem;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Source Serif 4",Georgia,serif;
+  font-size:1.125rem;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--clay);color:var(--paper)}
+a{color:var(--green);text-decoration-thickness:1px;text-underline-offset:3px}
+a:hover{color:var(--green-deep)}
+a:focus-visible,button:focus-visible{outline:3px solid var(--clay);outline-offset:3px;border-radius:2px}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 1.5rem}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+
+/* header */
+header{padding:1.6rem 0}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.mark{display:flex;align-items:center;gap:.65rem;text-decoration:none;color:var(--ink)}
+.mark svg{display:block}
+.mark span{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:1.02rem;letter-spacing:-.01em}
+header nav a{margin-left:1.4rem;font-family:"IBM Plex Mono",monospace;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;color:var(--faint)}
+header nav a:hover{color:var(--green)}
+@media(max-width:40rem){header nav{display:none}}
+
+/* hero */
+.hero{padding:5.5rem 0 6rem}
+.hero .mono{margin-bottom:1.6rem;display:block}
+h1{
+  font-family:"Bricolage Grotesque",sans-serif;
+  font-weight:800;
+  font-size:clamp(2.5rem,6.4vw,4.9rem);
+  line-height:1.02;
+  letter-spacing:-.025em;
+  max-width:20ch;
+}
+.hero .sub{
+  margin-top:1.9rem;
+  font-size:clamp(1.2rem,2.2vw,1.5rem);
+  line-height:1.5;
+  max-width:34ch;
+}
+.hero .sub b{font-weight:600;color:var(--green-deep)}
+.cta-row{margin-top:2.6rem;display:flex;align-items:center;gap:1.6rem;flex-wrap:wrap}
+.btn{
+  display:inline-block;
+  font-family:"Bricolage Grotesque",sans-serif;
+  font-weight:700;
+  font-size:1.02rem;
+  color:var(--paper);
+  background:var(--green);
+  padding:.85rem 1.6rem;
+  border-radius:.35rem;
+  text-decoration:none;
+  transition:background .15s ease;
+}
+.btn:hover{background:var(--green-deep);color:var(--paper)}
+.cta-row .quiet{font-family:"IBM Plex Mono",monospace;font-size:.85rem;letter-spacing:.04em}
+
+/* process rail */
+.process{padding:1rem 0 4.5rem}
+.stage{
+  display:grid;
+  grid-template-columns:4rem 1fr;
+  gap:0 1.6rem;
+  max-width:56rem;
+}
+.rail{position:relative;display:flex;justify-content:center}
+.rail::before{
+  content:"";
+  position:absolute;
+  top:0;bottom:0;left:50%;
+  width:2px;
+  transform:translateX(-50%);
+  background:var(--mist);
+}
+.stage:first-child .rail::before{top:.6rem}
+.stage:last-child .rail::before{bottom:auto;height:.6rem}
+.node{
+  position:relative;z-index:1;
+  width:1rem;height:1rem;
+  margin-top:.55rem;
+  border-radius:50%;
+  background:var(--paper);
+  border:3px solid var(--green);
+}
+.stage.stick .node{border-color:var(--clay)}
+.stage-body{padding:0 0 3.6rem}
+.stage:last-child .stage-body{padding-bottom:.5rem}
+.stage .mono{display:block;margin-bottom:.5rem}
+h2{
+  font-family:"Bricolage Grotesque",sans-serif;
+  font-weight:700;
+  font-size:clamp(1.55rem,3vw,2.1rem);
+  letter-spacing:-.015em;
+  line-height:1.15;
+  max-width:24ch;
+}
+.stage p{margin-top:.9rem;max-width:58ch}
+@media(max-width:40rem){
+  .stage{grid-template-columns:2.2rem 1fr;gap:0 1rem}
+}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+
+/* receipts */
+.receipts{background:var(--ink);color:var(--paper);padding:4.5rem 0}
+.receipts h2{color:var(--paper)}
+.receipts .mono{color:#9AA694}
+.receipt-grid{margin-top:2.4rem;display:grid;grid-template-columns:repeat(3,1fr);gap:2.4rem}
+.receipt h3{
+  font-family:"Bricolage Grotesque",sans-serif;
+  font-weight:700;font-size:1.12rem;letter-spacing:-.01em;
+  padding-top:.9rem;border-top:2px solid var(--green);
+}
+.receipts .receipt:last-child h3{border-top-color:var(--clay)}
+.receipt p{margin-top:.7rem;font-size:1rem;line-height:1.6;color:#CDD3C6}
+@media(max-width:48rem){.receipt-grid{grid-template-columns:1fr}}
+
+/* engagement */
+.engage{padding:4.5rem 0}
+.engage .mono{display:block;margin-bottom:.5rem}
+.steps{margin-top:2.2rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem}
+.step{
+  border:1px solid var(--mist);
+  background:#FFFFFF66;
+  border-radius:.45rem;
+  padding:1.5rem 1.4rem 1.6rem;
+}
+.step .mono{margin-bottom:.9rem}
+.step h3{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:1.15rem;letter-spacing:-.01em}
+.step p{margin-top:.6rem;font-size:1rem;line-height:1.6}
+@media(max-width:48rem){.steps{grid-template-columns:1fr}}
+
+/* contact */
+.contact{padding:3.5rem 0 6rem}
+.contact .card{
+  border-top:3px solid var(--green);
+  max-width:56rem;
+  padding-top:2.2rem;
+}
+.contact p{margin-top:1rem;max-width:52ch}
+.contact .cta-row{margin-top:1.8rem}
+
+/* footer */
+footer{border-top:1px solid var(--mist);padding:1.8rem 0 2.4rem}
+footer .wrap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+footer p{font-family:"IBM Plex Mono",monospace;font-size:.78rem;letter-spacing:.06em;color:var(--faint)}
+footer a{color:var(--faint)}
+footer a:hover{color:var(--green)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="mark" href="#top" aria-label="Ben Kanspedos home">
+      <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#35573C"/><circle cx="16" cy="8" r="2.6" fill="#F1F2EC"/><circle cx="16" cy="16" r="2.6" fill="#F1F2EC"/><circle cx="16" cy="24" r="2.6" fill="#B4552B"/><path d="M16 10.6v2.8m0 5.2v2.8" stroke="#F1F2EC" stroke-width="1.4"/></svg>
+      <span>Ben Kanspedos</span>
+    </a>
+    <nav aria-label="Sections">
+      <a href="#how">How I work</a>
+      <a href="#receipts">Receipts</a>
+      <a href="#start">Start</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <span class="mono">Applied AI consulting · Essential Concepts LLC · Tucson, AZ</span>
+      <h1>Companies have AI now and little to show for it.</h1>
+      <p class="sub">I <b>find</b> where it actually pays off in your business, <b>build</b> the workflows, and <b>make them stick</b>.</p>
+      <div class="cta-row">
+        <a class="btn" href="mailto:ben.kanspedos@gmail.com?subject=The%20task%20my%20team%20hates">Email Ben</a>
+        <a class="quiet" href="https://www.linkedin.com/in/ben-kanspedos-082b446" rel="me">LinkedIn</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="process" id="how" aria-label="How I work">
+    <div class="wrap">
+
+      <div class="stage reveal">
+        <div class="rail"><div class="node" aria-hidden="true"></div></div>
+        <div class="stage-body">
+          <span class="mono">01 · Find</span>
+          <h2>Start with the constraint, not the tool.</h2>
+          <p>Somewhere in your business, someone is doing the same task by hand fifty times a week. Somewhere else, an AI pilot you already paid for sits on a shelf. The first step is a diagnosis: map where the time and money actually go, then find the few places where automation genuinely pays. Sometimes the fix is AI. Sometimes it is killing a handoff. The diagnosis decides, not the tool.</p>
+        </div>
+      </div>
+
+      <div class="stage reveal">
+        <div class="rail"><div class="node" aria-hidden="true"></div></div>
+        <div class="stage-body">
+          <span class="mono">02 · Build</span>
+          <h2>Working automation, in production, on your systems.</h2>
+          <p>I build the thing, not a strategy deck about the thing. Claude-driven document pipelines, agent workflows, review gates, and the unglamorous glue between the tools your team already runs. No new platform to babysit, no ML team to hire.</p>
+        </div>
+      </div>
+
+      <div class="stage stick reveal">
+        <div class="rail"><div class="node" aria-hidden="true"></div></div>
+        <div class="stage-body">
+          <span class="mono">03 · Stick</span>
+          <h2>Adoption is a learning problem, not a software problem.</h2>
+          <p>This is the part most AI projects skip, and the reason most of them stall. I spent thirteen years in instructional design before anyone called this work AI. Every build ships with what your team needs to run it without me: documentation, job aids, working sessions with the people who own it. When I leave, the system is yours. That is the point.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="receipts" id="receipts">
+    <div class="wrap">
+      <span class="mono">Receipts</span>
+      <h2>Built, shipped, and running today.</h2>
+      <div class="receipt-grid">
+        <div class="receipt reveal">
+          <h3>21 years at Intuit</h3>
+          <p>Staff program manager across TurboTax and enterprise learning. My last two years: building agentic AI systems used by a 20,000-person customer service organization.</p>
+        </div>
+        <div class="receipt reveal">
+          <h3>Production SaaS</h3>
+          <p>Lead developer of ConvoWize, an AI conversation-coaching product built with two partners and live today, from architecture through billing.</p>
+        </div>
+        <div class="receipt reveal">
+          <h3>Client work in production now</h3>
+          <p>Document automation for a commercial real estate firm. An AI course-development engine for an e-learning vendor. Paid engagements, deployed, owned by the client.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="engage" id="start">
+    <div class="wrap">
+      <span class="mono">How an engagement works</span>
+      <h2>Small first step. Value before commitment.</h2>
+      <div class="steps">
+        <div class="step reveal">
+          <span class="mono">Step 1</span>
+          <h3>Diagnostic</h3>
+          <p>A short, structured look at where your team's time actually goes. You get a written map of the highest-payoff opportunities, useful whether or not we go further.</p>
+        </div>
+        <div class="step reveal">
+          <span class="mono">Step 2</span>
+          <h3>The quick win</h3>
+          <p>One workflow, fixed scope, fixed price, shipped to production. Priced on the value it returns, not the hours it takes.</p>
+        </div>
+        <div class="step reveal">
+          <span class="mono">Step 3</span>
+          <h3>Expand if it earns it</h3>
+          <p>Once the first win is running, we decide together what deserves the next build. A retainer when it makes sense. No lock-in.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact">
+    <div class="wrap">
+      <div class="card">
+        <h2>Tell me about the task your team hates.</h2>
+        <p>Two sentences about the work that eats your week is enough to start. If I am not the right fit, I will say so and point you somewhere better.</p>
+        <div class="cta-row">
+          <a class="btn" href="mailto:ben.kanspedos@gmail.com?subject=The%20task%20my%20team%20hates">ben.kanspedos@gmail.com</a>
+          <a class="quiet" href="https://www.linkedin.com/in/ben-kanspedos-082b446" rel="me">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Essential Concepts LLC · Tucson, Arizona</p>
+    <p><a href="mailto:ben.kanspedos@gmail.com">Email</a> · <a href="https://www.linkedin.com/in/ben-kanspedos-082b446" rel="me">LinkedIn</a></p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var els=document.querySelectorAll(".reveal");
+  if(reduce||!("IntersectionObserver" in window)){
+    els.forEach(function(el){el.classList.add("in")});
+    return;
+  }
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}
+    });
+  },{threshold:.18});
+  els.forEach(function(el){io.observe(el)});
+})();
+</script>
+
+</body>
+</html>

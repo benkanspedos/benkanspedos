@@ -1,0 +1,14 @@
+[build]
+  # Static single-page site. No build step; the repo root is the publish root.
+  publish = "."
+  command = ""
+
+[build.processing]
+  skip_processing = false
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin-when-cross-origin"
