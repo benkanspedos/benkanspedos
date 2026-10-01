@@ -955,7 +955,9 @@
       brackets(ctx, sx(PO.x) - m, sy(PO.y) - m, PO.w * a + 2 * m, PO.h * a + 2 * m, Math.max(8, PO.w * a * 0.16), ret);
       y = sy(PO.y + PO.h + 5.2) + 15;
       tag(ctx, L, 'BY HAND, 50× A WEEK', sx(PO.x + PO.w / 2), y, ret, 'center');
-      tag(ctx, L, 'AI PILOT, SHELVED', sx(pw.x + pw.w / 2), y, ret, 'center');
+      // side by side when the windows are wide enough apart, otherwise one under the other
+      var apart = (pw.x - PO.x) * a, drop = apart < (L.phone ? 152 : 172) ? (L.phone ? 24 : 26) : 0;
+      tag(ctx, L, 'AI PILOT, SHELVED', sx(pw.x + pw.w / 2), y + drop, ret, 'center');
     }
     // the diagnosis lands on the task
     if (S.diag > 0.01) {
