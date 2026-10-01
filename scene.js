@@ -387,7 +387,8 @@
 
     var wpx = b.ww * a, x0 = -T.x / a - 60, x1 = (L.w - T.x) / a + 60, y0 = -T.y / a - 60, y1 = (L.h - T.y) / a + 60;
     var wins = b.wins, nW = wins.length, g;
-    if (wpx < 30) {
+    var k = smooth(0.8, 1.15, a);   // 0: flat panes. 1: framed windows with a room behind each lit one
+    if (k < 1) {
       ctx.fillStyle = css(mixc(C.off, [26, 22, 54], n));
       ctx.beginPath();
       for (i = 0; i < nW; i++) { w = wins[i]; ctx.rect(w.x, w.y, w.w, w.h); }
@@ -417,13 +418,14 @@
         ctx.globalCompositeOperation = 'source-over';
       }
       ctx.globalAlpha = 1;
-      return;
     }
+    if (k <= 0) return;
     // close up: frames, sills, and a small room behind every lit pane
     var frame = css(mixc([58, 51, 110], [40, 35, 84], n)), sill = css(mixc([92, 82, 160], [60, 53, 120], n));
     for (i = 0; i < nW; i++) {
       w = wins[i];
       if (w.x > x1 || w.x + w.w < x0 || w.y > y1 || w.y + w.h < y0) continue;
+      ctx.globalAlpha = k;
       ctx.fillStyle = frame; ctx.fillRect(w.x - 2, w.y - 2, w.w + 4, w.h + 4);
       ctx.fillStyle = sill; ctx.fillRect(w.x - 3.5, w.y + w.h + 2, w.w + 7, 2.4);
       if (w.target && officeOn) continue;
@@ -434,9 +436,9 @@
         if (w.pilot) wtext(ctx, L, T, 'AI PILOT', w.x + w.w * 0.5, w.y + w.h * 0.404, w.h * 0.05, '500', F_MONO, '#3A2A22', 'center', 1);
         if (g > 0.01 && g < 1 && w.dim === 0) { ctx.fillStyle = css(mixc(C.off, [26, 22, 54], n), 1 - g); ctx.fillRect(w.x, w.y, w.w, w.h); }
         if (g > 0.3) {
-          ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = g * 0.5;
+          ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = g * 0.5 * k;
           ctx.drawImage(glow, w.x - w.w * 0.7, w.y - w.h * 0.6, w.w * 2.4, w.h * 2.2);
-          ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+          ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = k;
         }
       } else {
         ctx.fillStyle = css(mixc([36, 31, 78], [24, 21, 52], n)); ctx.fillRect(w.x, w.y, w.w, w.h);
@@ -444,10 +446,11 @@
         ctx.beginPath(); ctx.moveTo(w.x, w.y); ctx.lineTo(w.x + w.w * 0.7, w.y); ctx.lineTo(w.x, w.y + w.h * 0.8); ctx.closePath(); ctx.fill();
         if (w.blinds) {
           ctx.fillStyle = 'rgba(200,190,240,.09)';
-          for (var k = 0; k < 7; k++) ctx.fillRect(w.x, w.y + w.h * (0.06 + k * 0.075), w.w, w.h * 0.03);
+          for (var j = 0; j < 7; j++) ctx.fillRect(w.x, w.y + w.h * (0.06 + j * 0.075), w.w, w.h * 0.03);
         }
       }
     }
+    ctx.globalAlpha = 1;
   }
 
   function drawDistrict(ctx, L, T, S, t, officeOn) {
@@ -505,9 +508,9 @@
       for (i = 0; i < CLOUDS.length; i++) {
         var c = CLOUDS[i], cx = Tc.x + (((c[0] + t * c[4] + 2600) % 9000) - 2600) * Tc.a, cy = Tc.y + c[1] * Tc.a, cw = c[2] * Tc.a, ch = Math.max(c[3] * Tc.a, 1.5);
         if (cx > W || cx + cw < 0 || cy > H || cy + ch < 0) continue;
-        ctx.fillStyle = css(mixc([255, 170, 130], [70, 62, 130], n), (0.3 - 0.16 * n) * c[5]);
+        ctx.fillStyle = css(mixc([255, 170, 130], [70, 62, 130], n), (0.24 - 0.12 * n) * c[5]);
         rr(ctx, cx, cy, cw, ch, ch / 2); ctx.fill();
-        ctx.fillStyle = css(mixc([255, 214, 170], [96, 86, 160], n), (0.26 - 0.14 * n) * c[5]);
+        ctx.fillStyle = css(mixc([255, 214, 170], [96, 86, 160], n), (0.2 - 0.1 * n) * c[5]);
         rr(ctx, cx + cw * 0.18, cy + ch * 0.9, cw * 0.6, ch * 0.6, ch * 0.3); ctx.fill();
       }
     }
@@ -541,17 +544,26 @@
     }
     ctx.fillStyle = css(mixc([16, 13, 34], [9, 8, 22], n));
     for (i = 0; i < SAGUARO.length; i++) if (SAGUARO[i][0] > x0 - 60 && SAGUARO[i][0] < x1 + 60) saguaro(ctx, SAGUARO[i][0], SAGUARO[i][1]);
+    var intro = S.intro === undefined ? 1 : S.intro;
     for (i = 0; i < BLD.length; i++) {
       var b = BLD[i];
       if (b.x + b.w < x0 - 20 || b.x > x1 + 20) continue;
-      drawBuilding(ctx, L, T, S, t, b, officeOn);
+      if (intro < 1) {
+        var e = clamp(intro * 1.7 - Math.abs(b.i - FOCUS.i) * 0.1), up = 1 - Math.pow(1 - e, 3);
+        if (up <= 0) continue;
+        ctx.save();
+        ctx.beginPath(); ctx.rect(b.x - 10, GROUND - 3000, b.w + 20, 3000); ctx.clip();
+        ctx.translate(0, (1 - up) * (b.h + 150));
+        drawBuilding(ctx, L, T, S, t, b, officeOn);
+        ctx.restore();
+      } else drawBuilding(ctx, L, T, S, t, b, officeOn);
     }
     for (i = 0; i < LAMPS.length; i++) {
       var lx = LAMPS[i];
       if (lx < x0 - 80 || lx > x1 + 80) continue;
       ctx.fillStyle = css(mixc([14, 12, 32], [9, 8, 22], n));
       ctx.fillRect(lx - 1.6, GROUND - 66, 3.2, 70); ctx.fillRect(lx - 1.6, GROUND - 68, 16, 3);
-      ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.55 + 0.35 * n;
+      ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = (0.55 + 0.35 * n) * smooth(0.75, 1, intro);
       ctx.drawImage(glow, lx - 22, GROUND - 98, 70, 70);
       ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
       ctx.fillStyle = '#FFE9B8'; ctx.fillRect(lx + 8, GROUND - 65, 9, 3);
@@ -618,7 +630,7 @@
     // a second person, there for the working session
     if (SE > 0.01) {
       ctx.save();
-      ctx.globalAlpha = SE; ctx.translate((1 - SE) * 70, 0);
+      ctx.translate((1 - SE) * (1 - SE) * 230, 0);
       ctx.fillStyle = '#3A2F6E';
       ctx.beginPath(); ctx.arc(612, 318, 36, 0, TAU); ctx.fill();
       ctx.fillRect(601, 348, 22, 22);
@@ -936,12 +948,13 @@
     function sx(v) { return T.x + v * a; }
     function sy(v) { return T.y + v * a; }
     // the two windows the first beat is about
-    if (S.ret > 0.01) {
+    var ret = S.ret * smooth(62, 96, PO.w * a);   // wait until the two windows are big enough to label
+    if (ret > 0.01) {
       var pw = winAt(FOCUS, TF, TC + 1), m = Math.max(5, PO.w * a * 0.07);
-      brackets(ctx, sx(PO.x) - m, sy(PO.y) - m, PO.w * a + 2 * m, PO.h * a + 2 * m, Math.max(8, PO.w * a * 0.16), S.ret);
+      brackets(ctx, sx(PO.x) - m, sy(PO.y) - m, PO.w * a + 2 * m, PO.h * a + 2 * m, Math.max(8, PO.w * a * 0.16), ret);
       y = sy(PO.y + PO.h + 5.2) + 15;
-      tag(ctx, L, 'BY HAND, 50× A WEEK', sx(PO.x + PO.w / 2), y, S.ret, 'center');
-      tag(ctx, L, 'AI PILOT, SHELVED', sx(pw.x + pw.w / 2), y, S.ret, 'center');
+      tag(ctx, L, 'BY HAND, 50× A WEEK', sx(PO.x + PO.w / 2), y, ret, 'center');
+      tag(ctx, L, 'AI PILOT, SHELVED', sx(pw.x + pw.w / 2), y, ret, 'center');
     }
     // the diagnosis lands on the task
     if (S.diag > 0.01) {
@@ -1077,14 +1090,14 @@
     function measure() {
       var w = canvas.clientWidth, h = canvas.clientHeight;
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
-      dpr = Math.min(dpr, Math.sqrt(3.4e6 / (w * h)));
+      dpr = Math.min(dpr, Math.sqrt(4.6e6 / (w * h)));
       var phone = phoneMQ.matches;
       if (!L || L.w !== w || L.h !== h || L.dpr !== dpr) {
         canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
       }
       L = {
         w: w, h: h, dpr: dpr, phone: phone,
-        stage: phone ? { x0: 0.05, x1: 0.95, y0: 0.105, y1: 0.485 } : { x0: 0.43, x1: 0.97, y0: 0.12, y1: 0.9 },
+        stage: phone ? { x0: 0.05, x1: 0.95, y0: 0.105, y1: 0.485 } : { x0: 0.465, x1: 0.975, y0: 0.12, y1: 0.9 },
         hero: phone ? { x0: 0, x1: 1, y0: 0.66, y1: 0.955 } : { x0: 0, x1: 1, y0: 0.47, y1: 0.955 }
       };
       if (phone) {
@@ -1095,6 +1108,8 @@
           L.stages[BEATS[i]] = { x0: 0.05, x1: 0.95, y0: 0.105, y1: clamp(top - 0.06, 0.36, 0.64) };
         });
         L.stage = L.stages.buildB;
+      }
+      if (phone || h < 560) {   // short screens: keep the skyline under the opening text
         L.heroes = {};
         ['hero', 'contact'].forEach(function (k) {
           var i = BEATS.indexOf(k), pin = beatEls[i].querySelector('.pin');
@@ -1125,7 +1140,7 @@
       return n - 0.5;
     }
 
-    var lastOp = [], lastScrim = -1, lastMag = '', lastLv = -1, lastCue = -1;
+    var lastOp = [], lastScrim = -1, lastMag = '', lastLv = -1, lastCue = -1, lastPr = -1, bar = document.querySelector('.progress i');
     function chrome(s, tau, S, cam, info) {
       var n = dStart.length, i;
       for (i = 0; i < n; i++) {
@@ -1133,7 +1148,7 @@
         if (i > 0) { var lin = dStart[i] - dEnd[i - 1]; op = smooth(0.5, 0.93, (s - dEnd[i - 1]) / lin); }
         if (i < n - 1) { var lout = dStart[i + 1] - dEnd[i]; op = Math.min(op, 1 - smooth(0.02, 0.4, (s - dEnd[i]) / lout)); }
         op = Math.round(op * 100) / 100;
-        if (lastOp[i] !== op) { cards[i].style.opacity = op; cards[i].style.visibility = op === 0 ? 'hidden' : 'visible'; lastOp[i] = op; }
+        if (lastOp[i] !== op) { cards[i].style.opacity = op; cards[i].style.pointerEvents = op < 0.05 ? 'none' : ''; lastOp[i] = op; }
       }
       var sc = Math.round(S.scrim * 100) / 100;
       if (sc !== lastScrim) { scrim.style.opacity = sc; lastScrim = sc; }
@@ -1143,11 +1158,19 @@
       var stw = (L.stage.x1 - L.stage.x0) * L.w;
       var lv = info.pW > stw * 2.2 ? 4 : info.sW > stw * 0.55 ? 3 : info.oW > stw * 0.5 ? 2 : cam.s > heroS * 1.5 ? 1 : 0;
       if (lv !== lastLv) { levelEls.forEach(function (el, k) { el.classList.toggle('on', k === lv); }); lastLv = lv; }
+      var pr = Math.round(clamp(s / Math.max(1, dEnd[n - 1])) * 1000) / 1000;
+      if (bar && pr !== lastPr) { bar.style.transform = 'scaleX(' + pr + ')'; lastPr = pr; }
       var cu = Math.round((1 - smooth(0.02, 0.2, tau)) * 100) / 100;
       if (cue && cu !== lastCue) { cue.style.opacity = cu; lastCue = cu; }
     }
 
-    var ss = window.scrollY || 0, lastT = 0, lastDraw = 0, lastSS = -1, dirty = true;
+    var ss = window.scrollY || 0, lastT = 0, lastDraw = 0, lastSS = -1, dirty = true, introT0 = null;
+    // with a mouse, the scene leans a few pixels toward the pointer; the far layers lean less
+    var ptr = { x: 0, y: 0, tx: 0, ty: 0 };
+    if (!coarse) window.addEventListener('pointermove', function (e) {
+      if (e.pointerType === 'touch') return;
+      ptr.tx = e.clientX / L.w - 0.5; ptr.ty = e.clientY / L.h - 0.5;
+    }, { passive: true });
     function frame(now) {
       requestAnimationFrame(frame);
       if (document.hidden) return;
@@ -1156,10 +1179,16 @@
       var k = 1 - Math.exp(-dt / (coarse ? 55 : 95));
       ss += (target - ss) * k;
       if (Math.abs(target - ss) < 0.4) ss = target;
-      var moved = Math.abs(ss - lastSS) > 0.05;
+      var pk = 1 - Math.exp(-dt / 220), px0 = ptr.x, py0 = ptr.y;
+      ptr.x += (ptr.tx - ptr.x) * pk; ptr.y += (ptr.ty - ptr.y) * pk;
+      var moved = Math.abs(ss - lastSS) > 0.05 || Math.abs(ptr.x - px0) + Math.abs(ptr.y - py0) > 0.0004;
       if (!moved && !dirty && now - lastDraw < 33) return;   // idle: ambient motion at ~30fps
       lastSS = ss; lastDraw = now; dirty = false;
       var tau = tauAt(ss), S = stateAt(tau), cam = camAt(views, tau);
+      if (introT0 === null) introT0 = tau < 0.4 ? now : -1e9;
+      S.intro = clamp((now - introT0) / 1500);
+      if (S.intro < 1) dirty = true;
+      cam = { s: cam.s, cx: cam.cx + ptr.x * 26 / cam.s, cy: cam.cy + ptr.y * 14 / cam.s };
       var t0 = window.__perf ? performance.now() : 0;
       var info = render(ctx, L, cam, S, now / 1000);
       if (window.__perf) window.__perf.push(performance.now() - t0);
