@@ -1123,7 +1123,7 @@ function runStage() {
 
     // Hold a steady frame rate. Judged over four-second windows so one hitch changes nothing:
     // a window that is mostly long frames steps resolution down, a clean one steps it back up.
-    if (dt > 0.03) slow++;
+    if (dt > 0.042) slow++; // slower than 24 fps. A display capped at 30 (low power mode) is not a slow frame.
     if (++fast >= 240) {
       if (slow > 90 && quality > 0.6) { quality = Math.max(0.6, quality - 0.15); layout(); }
       else if (slow < 3 && quality < 1 && raises < 2) { quality = Math.min(1, quality + 0.15); raises++; layout(); }
