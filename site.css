@@ -34,7 +34,7 @@ a:focus-visible{outline:3px solid var(--acc,var(--clay));outline-offset:3px;bord
 .t-night{--bg1:#070B18;--bg2:#131A36;--fg:#EEF1F8;--soft:#AAB4D0;--acc:#9FE3FF;--scrim:rgba(17,23,48,.86);--btn:#F1F2EC;--btn-fg:#10162C}
 .t-survey{--bg1:#051617;--bg2:#0C2A29;--fg:#EAF3EF;--soft:#A3BDB6;--acc:#FF9A52;--scrim:rgba(10,36,35,.86);--btn:#F1F2EC;--btn-fg:#0C2A29}
 .t-blueprint{--bg1:#0A1C48;--bg2:#153273;--fg:#EEF3FF;--soft:#BACAEF;--acc:#FFB07A;--scrim:rgba(18,44,104,.86);--btn:#F1F2EC;--btn-fg:#0A1C48}
-.t-dawn{--bg1:#F4BE97;--bg2:#FBE7CF;--fg:#2A1D17;--soft:#59423A;--acc:#A5401A;--scrim:rgba(251,231,207,.86);--btn:#2A1D17;--btn-fg:#FBE7CF}
+.t-dawn{--bg1:#F4BE97;--bg2:#FBE7CF;--fg:#2A1D17;--soft:#59423A;--acc:#8F3413;--scrim:rgba(251,231,207,.86);--btn:#2A1D17;--btn-fg:#FBE7CF}
 .t-dusk{--bg1:#0B1528;--bg2:#22395C;--fg:#EEF2F8;--soft:#B4C0D4;--acc:#FFC56B;--scrim:rgba(28,48,80,.84);--btn:#F1F2EC;--btn-fg:#0B1528}
 .t-gold{--bg1:#F0CF7A;--bg2:#F8ECC6;--fg:#2A2412;--soft:#574D2C;--acc:#2F5237;--scrim:rgba(248,236,198,.86);--btn:#2F5237;--btn-fg:#F8ECC6}
 .t-paper{--bg1:#E3E8D8;--bg2:#F1F2EC;--fg:#1B2420;--soft:#4A5648;--acc:#35573C;--scrim:rgba(241,242,236,.88);--btn:#35573C;--btn-fg:#F1F2EC}
@@ -202,6 +202,18 @@ html[data-tone="light"] .rail{color:#1B2420}
   .btn{padding:.72rem 1.25rem}
   .mark span{font-size:.94rem}
   .btn-top{font-size:.84rem;padding:.5rem .95rem}
+}
+
+/* the hero's words arrive in order while the blocks fall into place */
+.stage-on #top .copy>*{opacity:0;transform:translateY(18px);animation:rise .95s cubic-bezier(.2,.7,.2,1) forwards}
+.stage-on #top .copy>:nth-child(1){animation-delay:.2s}
+.stage-on #top .copy>:nth-child(2){animation-delay:.35s}
+.stage-on #top .copy>:nth-child(3){animation-delay:.6s}
+.stage-on #top .copy>:nth-child(4){animation-delay:.8s}
+@keyframes rise{to{opacity:1;transform:none}}
+
+@media (min-width:56.01rem) and (max-width:75rem){
+  .stage-on .copy{width:min(30rem,44vw);margin-left:max(1.5rem,4.5vw)}
 }
 
 @media (prefers-reduced-motion:reduce){

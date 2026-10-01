@@ -146,7 +146,7 @@ function worldIdle() {
   const motes = [];
   for (let n = 0; n < 70; n++) {
     const i = L.next();
-    const o = { i, x: (R() - 0.5) * 24, y: 0.8 + R() * 8.5, z: (R() - 0.5) * 15, ph: R() * TAU, sp: 0.15 + R() * 0.4 };
+    const o = { i, x: (R() - 0.5) * 17, y: 0.8 + R() * 8.5, z: (R() - 0.5) * 13, ph: R() * TAU, sp: 0.15 + R() * 0.4 };
     motes.push(o);
     W.put(i, o.x, o.y, o.z, 0.05, 0.05, 0.05, ice, 0.8);
     W.k[i] = R();
@@ -260,7 +260,7 @@ function buildLine(W, L, pal, R) {
   for (let cx = 0; cx < GX; cx++) for (let cz = 0; cz < GZ; cz++) {
     const n = cx * GZ + cz, i = TILE0 + n, h = HEAT[n];
     const base = pal.floor[(cx + cz) % 2];
-    W.put(i, tileX(cx), 0.05, tileZ(cz), 0.94, 0.1, 0.94, mix3(base, pal.warm, sstep(0.45, 1, h) * 0.8), 0);
+    W.put(i, tileX(cx) * 0.9, 0.05, tileZ(cz) * 0.72, 0.85, 0.1, 0.68, mix3(base, pal.warm, sstep(0.45, 1, h) * 0.8), 0);
     W.h[i] = 0.4;
     W.k[i] = R() * 0.3;
   }
@@ -292,7 +292,7 @@ function buildLine(W, L, pal, R) {
   }
   for (let k = 0; k < 30; k++) { // intake heap
     const i = L.next(), a = R() * TAU, r = Math.pow(R(), 0.7) * 1.25;
-    W.put(i, -10.3 + Math.cos(a) * r * 0.6, 0.13 + R() * (1.25 - r) * 0.75, Math.sin(a) * r, 0.62, 0.03, 0.84, pal.docRaw, 0, R() * TAU, (R() - 0.5) * 0.5, (R() - 0.5) * 0.5);
+    W.put(i, -10.15 + Math.cos(a) * r * 0.5, 0.13 + R() * (1.25 - r) * 0.75, Math.sin(a) * r, 0.62, 0.03, 0.84, pal.docRaw, 0, R() * TAU, (R() - 0.5) * 0.5, (R() - 0.5) * 0.5);
     W.k[i] = R() * 0.2;
   }
   for (let k = 0; k < 24; k++) { // finished stack
@@ -488,7 +488,7 @@ function worldTalk() {
   hideRest(W, T);
   const motes = [];
   for (let n = 0; n < 46; n++) {
-    const i = L.next(), o = { i, x: (R() - 0.5) * 22, y: 0.8 + R() * 9.5, z: -2 - R() * 6, ph: R() * TAU, sp: 0.2 + R() * 0.4 };
+    const i = L.next(), o = { i, x: -6 + R() * 15, y: 0.8 + R() * 9.5, z: -2 - R() * 6, ph: R() * TAU, sp: 0.2 + R() * 0.4 };
     W.put(i, o.x, o.y, o.z, 0.07, 0.07, 0.07, lin('#ffd6f2'), 0.7); W.k[i] = R(); motes.push(o);
   }
   hideRest(W, L);
@@ -683,7 +683,7 @@ function worldLetter() {
       if (!o.hinge) { place(o.i, o.x, o.y, o.z, QG); continue; }
       place(o.i, o.x, topY + o.y * c - o.z * s, -0.02 + o.y * s + o.z * c, QT);
     }
-    for (const o of seal) { const y = -o.d, z = 0.27; place(o.i, o.x, topY + y * c - z * s, -0.02 + y * s + z * c, QT); W.g[o.i] = 0.28 + 0.1 * Math.sin(t * 2); }
+    for (const o of seal) { const y = -o.d, z = 0.27; place(o.i, o.x, topY + y * c - z * s, -0.02 + y * s + z * c, QT); W.g[o.i] = (0.28 + 0.1 * Math.sin(t * 2)) * (1 - open * 0.8); W.h[o.i] = 0.3 * (1 - open); }
     const ly = -0.25 + rise * 3.0;
     place(letter, 0, ly, -0.05, QG);
     for (const b of bars) place(b.i, b.x, ly + b.y, 0, QG);
@@ -705,17 +705,19 @@ const ENV = [
   { top: '#E3E8D8', bot: '#F1F2EC', spot: '#ffffff', spotI: 0.4, sky: '#ffffff', gnd: '#cfd6c2', hemi: 2.1, key: '#fffdf5', keyI: 3.8, kaz: -35, kel: 50, sh: 0.25, shc: '#2a3a2c', tone: 'light' },
 ].map((e) => ({ ...e, top: srgb(e.top), bot: srgb(e.bot), topL: oklch(srgb(e.top)), botL: oklch(srgb(e.bot)), spot: srgb(e.spot), sky: lin(e.sky), gnd: lin(e.gnd), key: lin(e.key), shc: lin(e.shc) }));
 
-// az/el in degrees, R = radius the framing must contain, t = look-at target, spin = degrees of orbit across the hold
+// az/el in degrees. w/h = the half-width and half-height (world units, as seen from this angle)
+// the framing must contain; t = look-at target; spin = degrees of orbit across the hold.
+// m = what changes on a phone, where the stage is a short wide band above the words.
 const CAM = [
-  { az: 32, el: 16, R: 8.2, t: [0, 2.9, 0], spin: 16, m: { R: 7.2 } },
-  { az: 26, el: 44, R: 12.6, t: [0, 0.9, 0], spin: 12, m: { az: 68, el: 40, R: 10.2, spin: 16 } },
-  { az: 24, el: 24, R: 9.6, t: [0, 1.5, 0], spin: 16, m: { az: 50, R: 8.3, spin: 20 } },
-  { az: -20, el: 20, R: 9.6, t: [0.4, 1.5, 0.6], spin: -14, m: { az: -50, R: 8.5, spin: -20 } },
-  { az: 38, el: 7, R: 7.4, t: [0, 6.0, 0], spin: 44 },
-  { az: -16, el: 3, R: 6.9, t: [0.9, 5.2, 0], spin: 14 },
-  { az: 18, el: 25, R: 8.5, t: [0, 1.6, 0], spin: 14, m: { az: 48, R: 7.6 } },
-  { az: 32, el: 22, R: 8.6, t: [-0.5, 2.0, 0], spin: -16, m: { R: 7.9 } },
-  { az: -12, el: 5, R: 6.6, t: [0, 5.6, 0], spin: 10, m: { R: 6.1 } },
+  { az: 32, el: 16, w: 8.6, h: 5.0, t: [0, 2.9, 0], spin: 16, m: { w: 7.2, h: 4.6 } },
+  { az: 46, el: 45, w: 12.8, h: 9.4, t: [0, 0.9, 0], spin: 14, m: { az: 68, el: 40, w: 11.6, h: 8.6, spin: 16 } },
+  { az: 40, el: 29, w: 11.0, h: 6.2, t: [0, 1.5, 0], spin: 18, m: { az: 50, el: 24, w: 8.6, h: 5.6, spin: 20 } },
+  { az: -38, el: 26, w: 11.1, h: 6.0, t: [0.3, 1.5, 0.3], spin: -18, m: { az: -50, el: 20, w: 8.8, h: 5.6, spin: -20 } },
+  { az: 38, el: 7, w: 5.0, h: 7.5, t: [0, 6.1, 0], spin: 44 },
+  { az: -16, el: 3, w: 7.0, h: 4.7, t: [0.9, 5.2, 0], spin: 14 },
+  { az: 18, el: 25, w: 8.7, h: 4.0, t: [0, 1.6, 0], spin: 14, m: { az: 48, w: 8.3, h: 4.8 } },
+  { az: 32, el: 22, w: 7.6, h: 4.6, t: [-0.5, 2.0, 0], spin: -16, m: { w: 8.3 } },
+  { az: -12, el: 5, w: 5.4, h: 5.5, t: [0, 5.9, 0], spin: 10, m: { h: 5.0, t: [0, 5.6, 0] } },
 ];
 const CAM_PHONE = CAM.map((c) => ({ ...c, ...(c.m || {}) }));
 
@@ -739,6 +741,7 @@ const hemi = new THREE.HemisphereLight(0xffffff, 0x000000, 1);
 const key = new THREE.DirectionalLight(0xffffff, 1);
 key.castShadow = true;
 scene.add(hemi, key, key.target);
+scene.fog = new THREE.Fog(0x000000, 10, 1000); // far blocks sink toward the sky colour
 
 const WORLDS = (() => {
   const idle = worldIdle();
@@ -907,8 +910,9 @@ const tgt = new THREE.Vector3();
 let floorTone = [0, 0, 0]; // the colour behind the words right now
 function setEnv(a, b, u, glowGain) {
   const A = ENV[a], B = ENV[b], U = bgMat.uniforms;
-  const bot = floorTone = mixLch(A.botL, B.botL, u);
-  U.uTop.value.fromArray(mixLch(A.topL, B.topL, u)); U.uBot.value.fromArray(bot);
+  const bot = floorTone = mixLch(A.botL, B.botL, u), top = mixLch(A.topL, B.topL, u);
+  U.uTop.value.fromArray(top); U.uBot.value.fromArray(bot);
+  scene.fog.color.setRGB(lerp(bot[0], top[0], 0.4), lerp(bot[1], top[1], 0.4), lerp(bot[2], top[2], 0.4), THREE.SRGBColorSpace);
   const sp = mix3(A.spot, B.spot, u), si = lerp(A.spotI, B.spotI, u) * (1 - 0.6 * Math.sin(Math.PI * u));
   U.uSpot.value.set((sp[0] - bot[0]) * si, (sp[1] - bot[1]) * si, (sp[2] - bot[2]) * si);
   hemi.color.fromArray(mix3(A.sky, B.sky, u)); hemi.groundColor.fromArray(mix3(A.gnd, B.gnd, u)); hemi.intensity = lerp(A.hemi, B.hemi, u);
@@ -924,10 +928,11 @@ function setCam(a, b, u, la, lb, time, view, focus, sway, cams = CAM) {
   const A = cams[a], B = cams[b];
   const az = (lerp(A.az + A.spin * (la - 0.5), B.az + B.spin * (lb - 0.5), u) + Math.sin(time * 0.13) * 1.6) * DEG + sway.x;
   const el = clamp((lerp(A.el, B.el, u) + Math.sin(time * 0.1) * 0.6) * DEG + sway.y, 0.02, 1.4);
-  const R = lerp(A.R, B.R, u);
   tgt.set(lerp(A.t[0], B.t[0], u), lerp(A.t[1], B.t[1], u), lerp(A.t[2], B.t[2], u));
-  const fit = Math.min(focus.h / view.h, (focus.w / view.w) * (view.w / view.h));
-  const d = (R * 1.06) / (FOVT * Math.max(0.12, fit));
+  // far enough back that the world's width fits the free width and its height fits the free height
+  // ...and a touch further while the page is moving fast, so a hard scroll reads as a pull back
+  const d = (1.05 + (sway.z || 0)) * Math.max(lerp(A.w, B.w, u) / (FOVT * Math.max(0.1, focus.w / view.h)), lerp(A.h, B.h, u) / (FOVT * Math.max(0.1, focus.h / view.h)));
+  scene.fog.near = d * 0.94; scene.fog.far = d * 1.25 + 46;
   camera.position.set(tgt.x + d * Math.cos(el) * Math.sin(az), tgt.y + d * Math.sin(el), tgt.z + d * Math.cos(el) * Math.cos(az));
   camera.lookAt(tgt);
   camera.aspect = view.w / view.h;
@@ -951,8 +956,7 @@ function renderStills() {
   renderer.setPixelRatio(1); renderer.setSize(w, h, false);
   renderer.setClearColor(0x000000, 0);
   bg.visible = false;
-  // frame tighter than the live stage does: a still has no camera move to leave room for
-  const view = { w, h }, focus = { x: w / 2, y: h / 2, w: w * 1.5, h: h * 1.25 }, sway = { x: 0, y: 0 };
+  const view = { w, h }, focus = { x: w / 2, y: h / 2, w: w * 0.98, h: h * 0.96 }, sway = { x: 0, y: 0 };
   document.querySelectorAll('figure.still[data-scene]').forEach((fig) => {
     const s = +fig.dataset.scene, Wd = WORLDS[s];
     if (Wd.update) Wd.update(2.6, 0.66);
@@ -1004,7 +1008,7 @@ function runStage() {
       if (b.dyn) b.steps.forEach((st) => { st.top = c.offsetTop + st.n.offsetTop; });
       const f = mobile
         ? { x0: 0, x1: view.w, y0: 58, y1: Math.max(view.h * 0.3, c.offsetTop - 6) }
-        : { x0: c.offsetLeft + c.offsetWidth - pad, x1: view.w - 40, y0: 64, y1: vh - 48 };
+        : { x0: c.offsetLeft + c.offsetWidth + pad * 0.5, x1: view.w - 40, y0: 64, y1: vh - 48 };
       const F = { x: (f.x0 + f.x1) / 2, y: (f.y0 + f.y1) / 2, w: f.x1 - f.x0, h: f.y1 - f.y0 };
       const n = b.scenes.length, seg = b.L / n;
       b.scenes.forEach((s, j) => {
@@ -1065,7 +1069,7 @@ function runStage() {
   }
 
   /* pointer: a small lean of the camera on devices that have one */
-  const sway = { x: 0, y: 0 }, swayT = { x: 0, y: 0 };
+  const sway = { x: 0, y: 0, z: 0 }, swayT = { x: 0, y: 0 };
   if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
     window.addEventListener('pointermove', (e) => { swayT.x = (e.clientX / window.innerWidth - 0.5) * -0.16; swayT.y = (e.clientY / window.innerHeight - 0.5) * 0.07; }, { passive: true });
   }
@@ -1089,6 +1093,7 @@ function runStage() {
     ySmooth += (scrollY - ySmooth) * (1 - Math.exp(-dt * 7.5));
     if (Math.abs(scrollY - ySmooth) < 0.05) ySmooth = scrollY;
     sway.x += (swayT.x - sway.x) * (1 - Math.exp(-dt * 3)); sway.y += (swayT.y - sway.y) * (1 - Math.exp(-dt * 3));
+    sway.z += (Math.min(0.13, (Math.abs(scrollY - ySmooth) / vh) * 0.32) - sway.z) * (1 - Math.exp(-dt * 5));
     intro = Math.min(1, intro + dt / 2.1);
 
     const P = PofY(ySmooth), a = Math.min(WORLDS.length - 1, Math.floor(P)), b = Math.min(WORLDS.length - 1, a + 1), p = P - a;
