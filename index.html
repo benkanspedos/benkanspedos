@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ben Kanspedos · Applied AI Consulting · Essential Concepts LLC</title>
 <meta name="description" content="Companies have AI now and little to show for it. I find where it actually pays off, build the workflows, and make them stick. Applied AI consulting by Ben Kanspedos, Essential Concepts LLC, Tucson AZ.">
+<meta name="theme-color" content="#232150">
 <meta property="og:title" content="Ben Kanspedos · Applied AI Consulting">
 <meta property="og:description" content="I find where AI actually pays off, build the workflows, and make them stick.">
 <meta property="og:type" content="website">
@@ -17,323 +18,389 @@
 <meta name="twitter:title" content="Ben Kanspedos · Applied AI Consulting">
 <meta name="twitter:description" content="I find where AI actually pays off, build the workflows, and make them stick.">
 <meta name="twitter:image" content="https://benkanspedos.com/og-image.png">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2335573C'/%3E%3Ccircle cx='16' cy='8' r='2.6' fill='%23F1F2EC'/%3E%3Ccircle cx='16' cy='16' r='2.6' fill='%23F1F2EC'/%3E%3Ccircle cx='16' cy='24' r='2.6' fill='%23B4552B'/%3E%3Cpath d='M16 10.6v2.8m0 5.2v2.8' stroke='%23F1F2EC' stroke-width='1.4'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23232150'/%3E%3Ccircle cx='8' cy='16' r='2.6' fill='%23FFF4E2'/%3E%3Ccircle cx='16' cy='16' r='2.6' fill='%23FFF4E2'/%3E%3Ccircle cx='24' cy='16' r='2.6' fill='%23D4552D'/%3E%3Cpath d='M10.6 16h2.8m5.2 0h2.8' stroke='%23FFF4E2' stroke-width='1.4'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Barlow:wght@500;600;700&family=Overpass+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --paper:#F1F2EC;
-  --ink:#212A20;
-  --green:#35573C;
-  --green-deep:#27402C;
-  --clay:#B4552B;
-  --mist:#DFE2D5;
-  --faint:#5C6659;
-  --max:72rem;
+  --cream:#fff4e2;
+  --ink:#13212a;
+  --plum:#2a0f2a;
+  --navy:#141a44;
+  --clay:#d4552d;
+  --gold:#ffcf6b;
+  --display:"Big Shoulders Display","Arial Narrow","Haettenschweiler",Impact,sans-serif;
+  --body:"Barlow","Helvetica Neue",Arial,sans-serif;
+  --mono:"Overpass Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --hud-h:64px;
+  --pad:clamp(20px,5vw,72px);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+html{font-size:17px;-webkit-text-size-adjust:100%}
 body{
-  background:var(--paper);
-  color:var(--ink);
-  font-family:"Source Serif 4",Georgia,serif;
-  font-size:1.125rem;
-  line-height:1.65;
-  -webkit-font-smoothing:antialiased;
-}
-::selection{background:var(--clay);color:var(--paper)}
-a{color:var(--green);text-decoration-thickness:1px;text-underline-offset:3px}
-a:hover{color:var(--green-deep)}
-a:focus-visible,button:focus-visible{outline:3px solid var(--clay);outline-offset:3px;border-radius:2px}
-.wrap{max-width:var(--max);margin:0 auto;padding:0 1.5rem}
-.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
-
-/* header */
-header{padding:1.6rem 0}
-header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1rem}
-.mark{display:flex;align-items:center;gap:.65rem;text-decoration:none;color:var(--ink)}
-.mark svg{display:block}
-.mark span{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:1.02rem;letter-spacing:-.01em}
-header nav a{margin-left:1.4rem;font-family:"IBM Plex Mono",monospace;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;color:var(--faint)}
-header nav a:hover{color:var(--green)}
-@media(max-width:40rem){header nav{display:none}}
-
-/* hero */
-.hero{padding:5.5rem 0 6rem}
-.hero .mono{margin-bottom:1.6rem;display:block}
-h1{
-  font-family:"Bricolage Grotesque",sans-serif;
-  font-weight:800;
-  font-size:clamp(2.5rem,6.4vw,4.9rem);
-  line-height:1.02;
-  letter-spacing:-.025em;
-  max-width:20ch;
-}
-.hero .sub{
-  margin-top:1.9rem;
-  font-size:clamp(1.2rem,2.2vw,1.5rem);
+  background:#070c24;
+  color:var(--cream);
+  font-family:var(--body);
+  font-weight:500;
+  font-size:1rem;
   line-height:1.5;
-  max-width:34ch;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
 }
-.hero .sub b{font-weight:600;color:var(--green-deep)}
-.cta-row{margin-top:2.6rem;display:flex;align-items:center;gap:1.6rem;flex-wrap:wrap}
-.btn{
-  display:inline-block;
-  font-family:"Bricolage Grotesque",sans-serif;
-  font-weight:700;
-  font-size:1.02rem;
-  color:var(--paper);
-  background:var(--green);
-  padding:.85rem 1.6rem;
-  border-radius:.35rem;
-  text-decoration:none;
-  transition:background .15s ease;
-}
-.btn:hover{background:var(--green-deep);color:var(--paper)}
-.cta-row .quiet{font-family:"IBM Plex Mono",monospace;font-size:.85rem;letter-spacing:.04em}
+::selection{background:var(--clay);color:var(--cream)}
+a{color:inherit}
+a:focus-visible{outline:3px solid currentColor;outline-offset:4px;border-radius:4px}
+#world,.grain,.track,.cue,.probe{display:none}
 
-/* process rail */
-.process{padding:1rem 0 4.5rem}
-.stage{
-  display:grid;
-  grid-template-columns:4rem 1fr;
-  gap:0 1.6rem;
-  max-width:56rem;
+/* ---------- HUD: the route rail ---------- */
+.hud{
+  position:sticky;top:0;z-index:5;
+  height:var(--hud-h);
+  display:flex;align-items:center;gap:clamp(.6rem,2vw,2rem);
+  padding:0 var(--pad);
+  background:var(--navy);
+  color:var(--hud-fg,var(--cream));
 }
-.rail{position:relative;display:flex;justify-content:center}
-.rail::before{
-  content:"";
-  position:absolute;
-  top:0;bottom:0;left:50%;
-  width:2px;
+.mark{
+  display:flex;align-items:center;gap:.55rem;
+  text-decoration:none;white-space:nowrap;
+  font-family:var(--display);font-weight:800;font-size:1.22rem;letter-spacing:.03em;text-transform:uppercase;
+}
+.mark svg{display:block;flex:none}
+.route{position:relative;flex:1;height:100%;max-width:33rem;margin:0 auto}
+.route .line{position:absolute;left:0;right:0;top:50%;height:2px;margin-top:-1px;background:currentColor;opacity:.3;border-radius:2px}
+.route .fill{position:absolute;left:0;top:50%;height:2px;margin-top:-1px;width:var(--r,0%);background:currentColor;border-radius:2px}
+.route a{
+  position:absolute;left:var(--at);top:0;height:100%;
   transform:translateX(-50%);
-  background:var(--mist);
+  display:flex;align-items:center;justify-content:center;
+  padding:0 .7rem;text-decoration:none;
 }
-.stage:first-child .rail::before{top:.6rem}
-.stage:last-child .rail::before{bottom:auto;height:.6rem}
-.node{
-  position:relative;z-index:1;
-  width:1rem;height:1rem;
-  margin-top:.55rem;
-  border-radius:50%;
-  background:var(--paper);
-  border:3px solid var(--green);
+.route b{
+  display:block;width:8px;height:8px;border-radius:50%;
+  background:currentColor;opacity:.45;
+  transition:transform .25s ease,opacity .25s ease,box-shadow .25s ease;
 }
-.stage.stick .node{border-color:var(--clay)}
-.stage-body{padding:0 0 3.6rem}
-.stage:last-child .stage-body{padding-bottom:.5rem}
-.stage .mono{display:block;margin-bottom:.5rem}
-h2{
-  font-family:"Bricolage Grotesque",sans-serif;
-  font-weight:700;
-  font-size:clamp(1.55rem,3vw,2.1rem);
-  letter-spacing:-.015em;
-  line-height:1.15;
-  max-width:24ch;
+.route a.reached b{opacity:1;transform:scale(1.35)}
+.route a.now b{box-shadow:0 0 0 5px rgba(212,85,45,.9)}
+.route span{
+  position:absolute;top:calc(50% + 11px);
+  font-family:var(--mono);font-weight:600;font-size:.6rem;line-height:1;letter-spacing:.14em;text-transform:uppercase;
+  opacity:.7;transition:opacity .25s ease;
 }
-.stage p{margin-top:.9rem;max-width:58ch}
-@media(max-width:40rem){
-  .stage{grid-template-columns:2.2rem 1fr;gap:0 1rem}
+.route a.reached span{opacity:1}
+.hud-cta{
+  font-family:var(--display);font-weight:800;font-size:1rem;line-height:1;letter-spacing:.06em;text-transform:uppercase;
+  text-decoration:none;white-space:nowrap;
+  padding:.55em .8em .5em;border:2px solid currentColor;border-radius:6px;
+  transition:transform .15s ease;
+}
+.hud-cta:hover{transform:translateY(-2px)}
+
+/* ---------- type ---------- */
+.kicker{font-family:var(--mono);font-weight:600;font-size:.7em;line-height:1.5;letter-spacing:.16em;text-transform:uppercase}
+h1,h2,h3,.word{font-family:var(--display)}
+h1{
+  font-weight:900;text-transform:uppercase;line-height:.9;letter-spacing:.004em;
+  font-size:calc(min(15vw,calc(var(--text-h,70vh) * .2)) * var(--fit,1));
+  text-wrap:balance;
+}
+.sub{font-size:1.2em;line-height:1.38;font-weight:500;max-width:26em}
+.sub b{font-weight:700;border-bottom:.14em solid var(--clay)}
+.cta-row{display:flex;align-items:center;gap:1.3em;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:.5em;
+  font-family:var(--display);font-weight:800;font-size:1.25em;line-height:1;letter-spacing:.05em;text-transform:uppercase;
+  text-decoration:none;color:var(--navy);background:var(--cream);
+  padding:.7em 1em .64em;border-radius:8px;
+  box-shadow:inset 0 0 0 3px var(--cream),inset 0 0 0 5px var(--navy);
+  transition:transform .15s ease,background .15s ease;
+}
+.btn:hover{background:var(--gold);box-shadow:inset 0 0 0 3px var(--gold),inset 0 0 0 5px var(--navy);transform:translateY(-2px)}
+.btn.addr{font-family:var(--body);font-weight:700;font-size:1.02em;letter-spacing:0;text-transform:none;padding:.85em 1.1em}
+.btn svg{flex:none}
+.quiet{font-family:var(--mono);font-weight:600;font-size:.78em;letter-spacing:.08em;text-transform:uppercase;text-underline-offset:4px}
+
+.num{font-family:var(--mono);font-weight:600;font-size:.8em;letter-spacing:.16em}
+.word{display:block;font-weight:900;text-transform:uppercase;line-height:.84;letter-spacing:.004em;font-size:4.2em}
+.stage h2{font-weight:800;font-size:1.62em;line-height:1.02;letter-spacing:.005em;text-wrap:balance}
+.stage p{margin-top:.6em;max-width:34em;text-wrap:pretty}
+
+.head h2{font-weight:900;text-transform:uppercase;font-size:1.8em;line-height:.95;letter-spacing:.006em;text-wrap:balance}
+.card{border-top:3px solid currentColor;padding-top:.7em}
+.card h3{font-weight:800;font-size:1.5em;line-height:1;letter-spacing:.01em}
+.card p{margin-top:.45em;font-size:.96em;line-height:1.48;text-wrap:pretty}
+.step .sign{
+  display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+  min-width:2.9em;padding:.32em .5em .3em;margin-bottom:.6em;
+  background:var(--cream);color:var(--navy);border-radius:6px;
+  box-shadow:inset 0 0 0 2px var(--cream),inset 0 0 0 4px var(--navy);
+}
+.step .sign small{font-family:var(--mono);font-weight:600;font-size:.52em;letter-spacing:.16em;text-transform:uppercase;line-height:1.5}
+.step .sign b{font-family:var(--display);font-weight:900;font-size:1.7em;line-height:.9}
+.step{border-top:0;padding-top:0}
+
+.contact h2{
+  font-weight:900;text-transform:uppercase;line-height:.92;letter-spacing:.004em;
+  font-size:calc(min(12.4vw,calc(var(--text-h,70vh) * .17)) * var(--fit,1));
+  text-wrap:balance;
+}
+.contact p{max-width:30em;font-size:1.08em}
+.fine{font-family:var(--mono);font-weight:400;font-size:.68em;letter-spacing:.08em;line-height:1.7;opacity:.85}
+.fine a{text-underline-offset:3px}
+
+/* ---------- sections: static base (no JS, or reduced motion) ---------- */
+.panel{position:relative;overflow:hidden;scroll-margin-top:var(--hud-h);color:var(--fg);background:var(--sky);padding:4.6rem var(--pad) calc(var(--pc-h,0px) + 3rem)}
+.panel .inner{position:relative;z-index:1;max-width:73rem;margin:0 auto}
+.panel canvas.postcard{position:absolute;left:0;bottom:0;width:100%;height:100%;z-index:0}
+.hero,.receipts,.engage,.contact{--fg:var(--cream)}
+.find,.build{--fg:var(--ink)}
+.stick{--fg:var(--plum)}
+.hero{--sky:linear-gradient(#232150,#4b3a78 48%,#b9668a 80%,#f6b88c)}
+.find{--sky:linear-gradient(#5fb0c6,#8fcbd0 48%,#cfe6d2 80%,#f7ebc9)}
+.build{--sky:linear-gradient(#3f9cc4,#6fb9d0 48%,#b5dcd6 80%,#eaf0d2)}
+.stick{--sky:linear-gradient(#ee7f4a,#f39a52 48%,#f8bd66 80%,#fde493)}
+.receipts{--sky:linear-gradient(#15174a,#3a2a72 48%,#8f3f7c 80%,#e86a70)}
+.engage{--sky:linear-gradient(#0a0f30,#16205a 60%,#3a2f78)}
+.contact{--sky:linear-gradient(#050920,#0a1338 48%,#12245a 80%,#1f3f7a)}
+
+.hero .kicker{margin-bottom:1.3em}
+.hero .sub{margin-top:1.3em}
+.hero .cta-row{margin-top:1.5em}
+.lead{display:flex;align-items:baseline;gap:.9em;margin-bottom:.7em}
+.head{margin-bottom:1.2em}
+.head .kicker{margin-bottom:.5em}
+.strip{display:grid;grid-template-columns:1fr;gap:1.6em}
+.dots{display:none}
+.contact p{margin-top:1.1em}
+.contact .cta-row{margin-top:1.4em}
+.fine{margin-top:1.8em}
+
+@media (min-width:900px){
+  h1{font-size:calc(min(7.6vw,calc(var(--text-h,70vh) * .235)) * var(--fit,1))}
+  .hero .inner{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(0,1fr);column-gap:4vw;align-items:end}
+  .hero .kicker{grid-column:1 / -1}
+  .hero .sub{margin-top:0}
+  .stage .inner{display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);column-gap:4vw;align-items:start}
+  .lead{display:block;margin-bottom:0}
+  .num{display:flex;align-items:center;gap:.9em;margin-bottom:.9em}
+  .num::after{content:"";height:2px;width:4.5em;background:currentColor}
+  .word{font-size:calc(min(15vw,calc(var(--text-h,70vh) * .5)) * var(--fit,1));margin-left:-.02em}
+  .stage h2{font-size:2.5em}
+  .stage p{font-size:1.2em;line-height:1.46}
+  .head h2{font-size:2.9em}
+  .card h3{font-size:1.7em}
+  .card p{font-size:1.06em}
+  .strip{grid-template-columns:repeat(3,minmax(0,1fr));gap:2.4em}
+  .contact .inner{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);column-gap:4vw;align-items:end}
+  .contact h2{font-size:calc(min(6.4vw,calc(var(--text-h,70vh) * .2)) * var(--fit,1))}
+  .contact p{margin-top:0}
+}
+@media (min-width:1700px){
+  html{font-size:clamp(17px,1.04vw,26px)}
+}
+@media (max-width:700px){
+  html{font-size:15.5px}
+  :root{--hud-h:56px}
+  .hud{gap:.5rem}
+  .mark{font-size:1.08rem;gap:.4rem}
+  .hud-cta{font-size:.92rem;padding:.5em .6em .45em}
+  .route a{padding:0 .3rem}
+  .route span{font-size:.55rem;letter-spacing:.1em}
+}
+@media (max-width:420px){
+  .mark span{display:none}
 }
 
-/* reveal */
-.reveal{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
-.reveal.in{opacity:1;transform:none}
-@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
-
-/* receipts */
-.receipts{background:var(--ink);color:var(--paper);padding:4.5rem 0}
-.receipts h2{color:var(--paper)}
-.receipts .mono{color:#9AA694}
-.receipt-grid{margin-top:2.4rem;display:grid;grid-template-columns:repeat(3,1fr);gap:2.4rem}
-.receipt h3{
-  font-family:"Bricolage Grotesque",sans-serif;
-  font-weight:700;font-size:1.12rem;letter-spacing:-.01em;
-  padding-top:.9rem;border-top:2px solid var(--green);
+/* ---------- journey mode: the page becomes one pinned stage ---------- */
+.journey #world{display:block;position:fixed;top:0;left:0;width:100%;height:100vh;height:100lvh;z-index:0}
+.journey .grain{display:block;position:fixed;top:0;left:0;width:100%;height:100vh;height:100lvh;z-index:1;pointer-events:none}
+.journey .track{display:block;width:1px}
+.journey .probe{display:block;position:fixed;top:0;left:-10px;width:1px;visibility:hidden;pointer-events:none}
+.journey .probe.s{height:100vh;height:100svh}
+.journey .probe.l{height:100vh;height:100lvh}
+.journey .hud{position:fixed;left:0;right:0;background:none}
+.journey main{position:fixed;top:0;left:0;right:0;height:100vh;height:100lvh;z-index:2;overflow:hidden;pointer-events:none}
+.journey .panel{
+  position:absolute;top:var(--hud-h);left:0;right:0;height:var(--text-h,50vh);
+  padding:0;background:none;overflow:visible;
+  opacity:0;will-change:transform,opacity;
+  transform:translate3d(var(--x,100vw),0,0);
 }
-.receipts .receipt:last-child h3{border-top-color:var(--clay)}
-.receipt p{margin-top:.7rem;font-size:1rem;line-height:1.6;color:#CDD3C6}
-@media(max-width:48rem){.receipt-grid{grid-template-columns:1fr}}
-
-/* engagement */
-.engage{padding:4.5rem 0}
-.engage .mono{display:block;margin-bottom:.5rem}
-.steps{margin-top:2.2rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem}
-.step{
-  border:1px solid var(--mist);
-  background:#FFFFFF66;
-  border-radius:.45rem;
-  padding:1.5rem 1.4rem 1.6rem;
+.journey .panel{display:flex;flex-direction:column}
+.journey .panel::before{content:"";flex:34 0 0px}
+.journey .panel::after{content:"";flex:66 0 0px}
+.journey .panel .inner{flex:none;width:100%}
+.journey .panel.on{pointer-events:auto}
+.journey .panel .inner{padding:clamp(4px,1.4vh,18px) var(--pad) 0;font-size:calc(1em * var(--fit,1))}
+.journey .panel .inner > *{transform:translate3d(calc(var(--x,0px) * var(--lag,0)),0,0)}
+.journey .stage .copy,.journey .hero .aside,.journey .contact .aside{--lag:.28}
+.journey .strip{--lag:.2}
+.journey .word span{display:inline-block;transform:translate3d(calc(var(--x,0px) * var(--lag,0)),0,0)}
+.journey .cue{
+  display:flex;position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);z-index:3;
+  justify-content:center;align-items:center;gap:.6em;
+  font-family:var(--mono);font-weight:600;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--cream);pointer-events:none;
 }
-.step .mono{margin-bottom:.9rem}
-.step h3{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:1.15rem;letter-spacing:-.01em}
-.step p{margin-top:.6rem;font-size:1rem;line-height:1.6}
-@media(max-width:48rem){.steps{grid-template-columns:1fr}}
+.journey .cue i{display:block;width:26px;height:2px;background:currentColor;position:relative;overflow:hidden;opacity:.9}
+.journey .cue i::after{content:"";position:absolute;inset:0;background:var(--clay);transform:translateX(-100%);animation:cue 1.6s ease-in-out infinite}
+@keyframes cue{60%,100%{transform:translateX(100%)}}
+.journey .fine{margin-top:1.1em}
 
-/* contact */
-.contact{padding:3.5rem 0 6rem}
-.contact .card{
-  border-top:3px solid var(--green);
-  max-width:56rem;
-  padding-top:2.2rem;
+@media (max-width:899px){
+  .journey .strip.slide{display:flex;gap:14px;will-change:transform}
+  .journey .strip.slide .card{flex:0 0 min(84%,380px)}
+  .journey .strip.slide + .dots{display:flex;gap:7px;margin-top:.9em}
+  .journey .dots i{width:18px;height:3px;border-radius:2px;background:currentColor;opacity:.3;transition:opacity .2s}
+  .journey .dots i.on{opacity:1}
+  .journey .head{margin-bottom:.9em}
 }
-.contact p{margin-top:1rem;max-width:52ch}
-.contact .cta-row{margin-top:1.8rem}
-
-/* footer */
-footer{border-top:1px solid var(--mist);padding:1.8rem 0 2.4rem}
-footer .wrap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
-footer p{font-family:"IBM Plex Mono",monospace;font-size:.78rem;letter-spacing:.06em;color:var(--faint)}
-footer a{color:var(--faint)}
-footer a:hover{color:var(--green)}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="wrap">
-    <a class="mark" href="#top" aria-label="Ben Kanspedos home">
-      <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#35573C"/><circle cx="16" cy="8" r="2.6" fill="#F1F2EC"/><circle cx="16" cy="16" r="2.6" fill="#F1F2EC"/><circle cx="16" cy="24" r="2.6" fill="#B4552B"/><path d="M16 10.6v2.8m0 5.2v2.8" stroke="#F1F2EC" stroke-width="1.4"/></svg>
-      <span>Ben Kanspedos</span>
-    </a>
-    <nav aria-label="Sections">
-      <a href="#how">How I work</a>
-      <a href="#receipts">Receipts</a>
-      <a href="#start">Start</a>
-    </nav>
-  </div>
+<canvas id="world" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="probe s" aria-hidden="true"></div>
+<div class="probe l" aria-hidden="true"></div>
+
+<header class="hud">
+  <a class="mark" href="#top" data-go="hero" aria-label="Ben Kanspedos, back to the start">
+    <svg width="24" height="24" viewBox="0 0 32 32" aria-hidden="true"><rect x="1.5" y="1.5" width="29" height="29" rx="7" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M10.6 16h2.8m5.2 0h2.8" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="16" r="2.6" fill="currentColor"/><circle cx="16" cy="16" r="2.6" fill="currentColor"/><circle cx="24" cy="16" r="2.6" fill="#D4552D"/></svg>
+    <span>Ben Kanspedos</span>
+  </a>
+  <nav class="route" aria-label="Sections">
+    <i class="line" aria-hidden="true"></i><i class="fill" aria-hidden="true"></i>
+    <a href="#find" data-go="find" style="--at:16%"><b></b><span>Find</span></a>
+    <a href="#build" data-go="build" style="--at:50%"><b></b><span>Build</span></a>
+    <a href="#stick" data-go="stick" style="--at:84%"><b></b><span>Stick</span></a>
+  </nav>
+  <a class="hud-cta" href="mailto:ben.kanspedos@gmail.com?subject=The%20task%20my%20team%20hates">Email Ben</a>
 </header>
 
 <main id="top">
-  <section class="hero">
-    <div class="wrap">
-      <span class="mono">Applied AI consulting · Essential Concepts LLC · Tucson, AZ</span>
+
+  <section class="panel hero" id="hero" data-ch="hero">
+    <div class="inner">
+      <p class="kicker">Applied AI consulting · Essential Concepts LLC · Tucson, AZ</p>
       <h1>Companies have AI now and little to show for it.</h1>
-      <p class="sub">I <b>find</b> where it actually pays off in your business, <b>build</b> the workflows, and <b>make them stick</b>.</p>
-      <div class="cta-row">
-        <a class="btn" href="mailto:ben.kanspedos@gmail.com?subject=The%20task%20my%20team%20hates">Email Ben</a>
-        <a class="quiet" href="https://www.linkedin.com/in/ben-kanspedos-082b446" rel="me">LinkedIn</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="process" id="how" aria-label="How I work">
-    <div class="wrap">
-
-      <div class="stage reveal">
-        <div class="rail"><div class="node" aria-hidden="true"></div></div>
-        <div class="stage-body">
-          <span class="mono">01 · Find</span>
-          <h2>Start with the constraint, not the tool.</h2>
-          <p>Somewhere in your business, someone is doing the same task by hand fifty times a week. Somewhere else, an AI pilot you already paid for sits on a shelf. The first step is a diagnosis: map where the time and money actually go, then find the few places where automation genuinely pays. Sometimes the fix is AI. Sometimes it is killing a handoff. The diagnosis decides, not the tool.</p>
-        </div>
-      </div>
-
-      <div class="stage reveal">
-        <div class="rail"><div class="node" aria-hidden="true"></div></div>
-        <div class="stage-body">
-          <span class="mono">02 · Build</span>
-          <h2>Working automation, in production, on your systems.</h2>
-          <p>I build the thing, not a strategy deck about the thing. Claude-driven document pipelines, agent workflows, review gates, and the unglamorous glue between the tools your team already runs. No new platform to babysit, no ML team to hire.</p>
-        </div>
-      </div>
-
-      <div class="stage stick reveal">
-        <div class="rail"><div class="node" aria-hidden="true"></div></div>
-        <div class="stage-body">
-          <span class="mono">03 · Stick</span>
-          <h2>Adoption is a learning problem, not a software problem.</h2>
-          <p>This is the part most AI projects skip, and the reason most of them stall. I spent thirteen years in instructional design before anyone called this work AI. Every build ships with what your team needs to run it without me: documentation, job aids, working sessions with the people who own it. When I leave, the system is yours. That is the point.</p>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <section class="receipts" id="receipts">
-    <div class="wrap">
-      <span class="mono">Receipts</span>
-      <h2>Built, shipped, and running today.</h2>
-      <div class="receipt-grid">
-        <div class="receipt reveal">
-          <h3>21 years at Intuit</h3>
-          <p>Staff program manager across TurboTax and enterprise learning. My last two years: building agentic AI systems used by a 20,000-person customer service organization.</p>
-        </div>
-        <div class="receipt reveal">
-          <h3>Production SaaS</h3>
-          <p>Lead developer of ConvoWize, an AI conversation-coaching product built with two partners and live today, from architecture through billing.</p>
-        </div>
-        <div class="receipt reveal">
-          <h3>Client work in production now</h3>
-          <p>Document automation for a commercial real estate firm. An AI course-development engine for an e-learning vendor. Paid engagements, deployed, owned by the client.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="engage" id="start">
-    <div class="wrap">
-      <span class="mono">How an engagement works</span>
-      <h2>Small first step. Value before commitment.</h2>
-      <div class="steps">
-        <div class="step reveal">
-          <span class="mono">Step 1</span>
-          <h3>Diagnostic</h3>
-          <p>A short, structured look at where your team's time actually goes. You get a written map of the highest-payoff opportunities, useful whether or not we go further.</p>
-        </div>
-        <div class="step reveal">
-          <span class="mono">Step 2</span>
-          <h3>The quick win</h3>
-          <p>One workflow, fixed scope, fixed price, shipped to production. Priced on the value it returns, not the hours it takes.</p>
-        </div>
-        <div class="step reveal">
-          <span class="mono">Step 3</span>
-          <h3>Expand if it earns it</h3>
-          <p>Once the first win is running, we decide together what deserves the next build. A retainer when it makes sense. No lock-in.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="contact">
-    <div class="wrap">
-      <div class="card">
-        <h2>Tell me about the task your team hates.</h2>
-        <p>Two sentences about the work that eats your week is enough to start. If I am not the right fit, I will say so and point you somewhere better.</p>
+      <div class="aside">
+        <p class="sub">I <b>find</b> where it actually pays off in your business, <b>build</b> the workflows, and <b>make them stick</b>.</p>
         <div class="cta-row">
-          <a class="btn" href="mailto:ben.kanspedos@gmail.com?subject=The%20task%20my%20team%20hates">ben.kanspedos@gmail.com</a>
+          <a class="btn" href="mailto:ben.kanspedos@gmail.com?subject=The%20task%20my%20team%20hates">Email Ben
+            <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true"><path d="M0 7h17M12 1.5 17.5 7 12 12.5" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>
+          </a>
           <a class="quiet" href="https://www.linkedin.com/in/ben-kanspedos-082b446" rel="me">LinkedIn</a>
         </div>
       </div>
     </div>
   </section>
+
+  <section class="panel stage find" id="find" data-ch="find" aria-labelledby="find-h">
+    <div class="inner">
+      <div class="lead"><span class="num">01</span><span class="word">Find</span></div>
+      <div class="copy">
+        <h2 id="find-h">Start with the constraint, not the tool.</h2>
+        <p>Somewhere in your business, someone is doing the same task by hand fifty times a week. Somewhere else, an AI pilot you already paid for sits on a shelf. The first step is a diagnosis: map where the time and money actually go, then find the few places where automation genuinely pays. Sometimes the fix is AI. Sometimes it is killing a handoff. The diagnosis decides, not the tool.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel stage build" id="build" data-ch="build" aria-labelledby="build-h">
+    <div class="inner">
+      <div class="lead"><span class="num">02</span><span class="word">Build</span></div>
+      <div class="copy">
+        <h2 id="build-h">Working automation, in production, on your systems.</h2>
+        <p>I build the thing, not a strategy deck about the thing. Claude-driven document pipelines, agent workflows, review gates, and the unglamorous glue between the tools your team already runs. No new platform to babysit, no ML team to hire.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel stage stick" id="stick" data-ch="stick" aria-labelledby="stick-h">
+    <div class="inner">
+      <div class="lead"><span class="num">03</span><span class="word">Stick</span></div>
+      <div class="copy">
+        <h2 id="stick-h">Adoption is a learning problem, not a software problem.</h2>
+        <p>This is the part most AI projects skip, and the reason most of them stall. I spent thirteen years in instructional design before anyone called this work AI. Every build ships with what your team needs to run it without me: documentation, job aids, working sessions with the people who own it. When I leave, the system is yours. That is the point.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel receipts" id="receipts" data-ch="receipts" aria-labelledby="receipts-h">
+    <div class="inner">
+      <div class="head">
+        <p class="kicker">Receipts</p>
+        <h2 id="receipts-h">Built, shipped, and running today.</h2>
+      </div>
+      <div class="strip">
+        <div class="card">
+          <h3>21 years at Intuit</h3>
+          <p>Staff program manager across TurboTax and enterprise learning. My last two years: building agentic AI systems used by a 20,000-person customer service organization.</p>
+        </div>
+        <div class="card">
+          <h3>Production SaaS</h3>
+          <p>Lead developer of ConvoWize, an AI conversation-coaching product built with two partners and live today, from architecture through billing.</p>
+        </div>
+        <div class="card">
+          <h3>Client work in production now</h3>
+          <p>Document automation for a commercial real estate firm. An AI course-development engine for an e-learning vendor. Paid engagements, deployed, owned by the client.</p>
+        </div>
+      </div>
+      <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+    </div>
+  </section>
+
+  <section class="panel engage" id="start" data-ch="engage" aria-labelledby="start-h">
+    <div class="inner">
+      <div class="head">
+        <p class="kicker">How an engagement works</p>
+        <h2 id="start-h">Small first step. Value before commitment.</h2>
+      </div>
+      <div class="strip">
+        <div class="card step">
+          <span class="sign"><small>Step</small><b>1</b></span>
+          <h3>Diagnostic</h3>
+          <p>A short, structured look at where your team's time actually goes. You get a written map of the highest-payoff opportunities, useful whether or not we go further.</p>
+        </div>
+        <div class="card step">
+          <span class="sign"><small>Step</small><b>2</b></span>
+          <h3>The quick win</h3>
+          <p>One workflow, fixed scope, fixed price, shipped to production. Priced on the value it returns, not the hours it takes.</p>
+        </div>
+        <div class="card step">
+          <span class="sign"><small>Step</small><b>3</b></span>
+          <h3>Expand if it earns it</h3>
+          <p>Once the first win is running, we decide together what deserves the next build. A retainer when it makes sense. No lock-in.</p>
+        </div>
+      </div>
+      <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+    </div>
+  </section>
+
+  <section class="panel contact" id="contact" data-ch="contact" aria-labelledby="contact-h">
+    <div class="inner">
+      <h2 id="contact-h">Tell me about the task your team hates.</h2>
+      <div class="aside">
+        <p>Two sentences about the work that eats your week is enough to start. If I am not the right fit, I will say so and point you somewhere better.</p>
+        <div class="cta-row">
+          <a class="btn addr" href="mailto:ben.kanspedos@gmail.com?subject=The%20task%20my%20team%20hates">
+            <svg width="20" height="15" viewBox="0 0 20 15" aria-hidden="true"><rect x="1.2" y="1.2" width="17.6" height="12.6" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="m2 2.5 8 6 8-6" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            ben.kanspedos@gmail.com
+          </a>
+          <a class="quiet" href="https://www.linkedin.com/in/ben-kanspedos-082b446" rel="me">LinkedIn</a>
+        </div>
+        <footer class="fine">Essential Concepts LLC · Tucson, Arizona</footer>
+      </div>
+    </div>
+  </section>
+
 </main>
 
-<footer>
-  <div class="wrap">
-    <p>Essential Concepts LLC · Tucson, Arizona</p>
-    <p><a href="mailto:ben.kanspedos@gmail.com">Email</a> · <a href="https://www.linkedin.com/in/ben-kanspedos-082b446" rel="me">LinkedIn</a></p>
-  </div>
-</footer>
+<div class="cue" aria-hidden="true"><span>Scroll to drive</span><i></i></div>
+<div class="track" aria-hidden="true"></div>
 
-<script>
-(function(){
-  var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var els=document.querySelectorAll(".reveal");
-  if(reduce||!("IntersectionObserver" in window)){
-    els.forEach(function(el){el.classList.add("in")});
-    return;
-  }
-  var io=new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}
-    });
-  },{threshold:.18});
-  els.forEach(function(el){io.observe(el)});
-})();
-</script>
-
+<script src="journey.js"></script>
 </body>
 </html>
