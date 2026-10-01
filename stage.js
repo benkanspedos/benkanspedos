@@ -101,7 +101,7 @@ const pool = (a, n) => {
 };
 const hideRest = (W, P) => { while (P.left()) W.hide(P.next()); };
 
-const _Q = new THREE.Quaternion(), _Q2 = new THREE.Quaternion(), _V = new THREE.Vector3();
+const _Q = new THREE.Quaternion(), _Q2 = new THREE.Quaternion(), _V = new THREE.Vector3(), _E = new THREE.Euler();
 const UP = new THREE.Vector3(0, 1, 0), XA = new THREE.Vector3(1, 0, 0);
 
 const tileX = (cx) => cx - (GX - 1) / 2;
@@ -161,7 +161,7 @@ function worldIdle() {
     for (let n = 0; n < CORE_N; n++) {
       _V.set((n % 3 - 1) * pitch, (((n / 3) | 0) % 3 - 1) * pitch, (((n / 9) | 0) - 1) * pitch).applyQuaternion(_Q);
       W.P(n, _V.x, cy + _V.y, _V.z); W.Q(n, _Q);
-      W.g[n] = 0.62 + 0.22 * Math.sin(t * 1.4 + n);
+      W.g[n] = 0.46 + 0.2 * Math.sin(t * 1.4 + n);
     }
     for (const o of air) {
       W.P(o.i, o.x + Math.sin(t * 0.21 + o.ph) * 0.5, o.y + Math.sin(t * 0.4 + o.ph) * 0.4, o.z + Math.cos(t * 0.17 + o.ph) * 0.4);
@@ -239,7 +239,9 @@ function worldSurvey(idle) {
     for (const o of tiles) {
       const s = sstep(-0.7, 0.7, sx - o.x), sy = 0.1 + s * o.rise;
       W.S(o.i, 0.9, sy, 0.9); W.P(o.i, o.x, sy / 2, o.z);
-      W.C(o.i, mix3(o.raw, o.hot, s)); W.g[o.i] = s * o.glow * (0.85 + 0.15 * Math.sin(t * 2 + o.x));
+      const c = W.c, i3 = o.i * 3, a = o.raw, b = o.hot;
+      c[i3] = a[0] + (b[0] - a[0]) * s; c[i3 + 1] = a[1] + (b[1] - a[1]) * s; c[i3 + 2] = a[2] + (b[2] - a[2]) * s;
+      W.g[o.i] = s * o.glow * (0.85 + 0.15 * Math.sin(t * 2 + o.x));
     }
     for (let n = 0; n < CORE_N; n++) W.P(n, sx, 1.7 + 0.1 * Math.sin(t * 3 + n * 0.6), (n - 13) * 0.5);
     for (const f of flags) {
@@ -621,14 +623,14 @@ function worldSteps() {
     steps.forEach((st, k) => {
       const reach = clamp(f - k + 1), act = Math.max(0, 1 - Math.abs(f - k));
       const col = mix3(mix3(stone, green, reach), bright, act * 0.45), lift = act * 0.14;
-      for (const c of st.cubes) { W.C(c.i, [col[0] * c.v, col[1] * c.v, col[2] * c.v]); W.P(c.i, c.x, c.y + lift, c.z); }
+      for (const c of st.cubes) { const i3 = c.i * 3; W.c[i3] = col[0] * c.v; W.c[i3 + 1] = col[1] * c.v; W.c[i3 + 2] = col[2] * c.v; W.P(c.i, c.x, c.y + lift, c.z); }
       const grow = k === 0 ? 1 : sstep(0.15, 1, reach);
       for (const o of st.decor) { W.S(o.i, o.sx * grow, o.sy * grow, o.sz * grow); W.P(o.i, o.x, o.y + lift, o.z); W.g[o.i] = o.g * grow; }
     });
     for (const d of docs) { const u = (d.ph + t * 0.22) % 1, s = Math.sin(u * Math.PI); W.p[d.o.i * 3] = d.x0 + d.len * u; W.s[d.o.i * 3] *= Math.min(1, s * 4); W.s[d.o.i * 3 + 2] *= Math.min(1, s * 4); }
     const k0 = Math.floor(clamp(f, 0, 1.999)), u = f - k0, a = steps[k0], b = steps[k0 + 1] || a;
     const mx = lerp(a.x, b.x, u), my = lerp(a.top, b.top, u) + 1.9 + Math.sin(u * Math.PI) * 1.4 + Math.sin(t * 1.3) * 0.1;
-    _Q.setFromEuler(new THREE.Euler(t * 0.5, t * 0.7, 0));
+    _Q.setFromEuler(_E.set(t * 0.5, t * 0.7, 0, 'XYZ'));
     for (let n = 0; n < CORE_N; n++) {
       _V.set((n % 3 - 1) * 0.25, (((n / 3) | 0) % 3 - 1) * 0.25, (((n / 9) | 0) - 1) * 0.25).applyQuaternion(_Q);
       W.P(n, mx + _V.x, my + _V.y, _V.z); W.Q(n, _Q);
@@ -675,7 +677,7 @@ function worldLetter() {
   const QG = new THREE.Quaternion(), QH = new THREE.Quaternion(), QT = new THREE.Quaternion(), V = new THREE.Vector3();
   W.update = (t, local) => {
     const open = sstep(0.12, 0.7, local), rise = sstep(0.34, 0.95, local), phi = -open * 3.3;
-    QG.setFromEuler(new THREE.Euler(-0.16, Math.sin(t * 0.5) * 0.09, 0, 'YXZ'));
+    QG.setFromEuler(_E.set(-0.16, Math.sin(t * 0.5) * 0.09, 0, 'YXZ'));
     QH.setFromAxisAngle(XA, phi); QT.copy(QG).multiply(QH);
     const cy = 4.3 + Math.sin(t * 0.8) * 0.1, c = Math.cos(phi), s = Math.sin(phi);
     const place = (i, x, y, z, q) => { V.set(x, y, z).applyQuaternion(QG); W.P(i, V.x, cy + V.y, V.z); W.Q(i, q); };
@@ -716,7 +718,7 @@ const CAM = [
   { az: 38, el: 7, w: 5.0, h: 7.5, t: [0, 6.1, 0], spin: 44 },
   { az: -16, el: 3, w: 7.0, h: 4.7, t: [0.9, 5.2, 0], spin: 14 },
   { az: 18, el: 25, w: 8.7, h: 4.0, t: [0, 1.6, 0], spin: 14, m: { az: 48, w: 8.3, h: 4.8 } },
-  { az: 32, el: 22, w: 7.6, h: 4.6, t: [-0.5, 2.0, 0], spin: -16, m: { w: 8.3 } },
+  { az: 32, el: 22, w: 8.5, h: 4.6, t: [-0.5, 2.0, 0], spin: -16 },
   { az: -12, el: 5, w: 5.4, h: 5.5, t: [0, 5.9, 0], spin: 10, m: { h: 5.0, t: [0, 5.6, 0] } },
 ];
 const CAM_PHONE = CAM.map((c) => ({ ...c, ...(c.m || {}) }));
@@ -995,7 +997,7 @@ function runStage() {
   function layout() {
     view.w = canvas.clientWidth; view.h = canvas.clientHeight;
     mobile = phone.matches;
-    dpr = Math.min(window.devicePixelRatio || 1, 2) * quality;
+    dpr = Math.max(0.75, Math.min(window.devicePixelRatio || 1, 2) * quality);
     renderer.setPixelRatio(dpr); renderer.setSize(view.w, view.h, false);
     vh = beats[0].pin.offsetHeight;
     const sy = window.scrollY;
@@ -1074,7 +1076,7 @@ function runStage() {
     window.addEventListener('pointermove', (e) => { swayT.x = (e.clientX / window.innerWidth - 0.5) * -0.16; swayT.y = (e.clientY / window.innerHeight - 0.5) * 0.07; }, { passive: true });
   }
 
-  let quality = 1, slow = 0, fast = 0, scrim = '';
+  let quality = 1, slow = 0, fast = 0, raises = 0, scrim = '';
   let t0 = performance.now(), last = t0, intro = 0, visible = true, raf = 0;
   const focus = { x: 0, y: 0, w: 1, h: 1 }, focusT = { x: 0, y: 0, w: 1, h: 1 }, shot = { x: 0, y: 0, w: 1, h: 1 };
   const focusFor = (s, y) => {
@@ -1119,9 +1121,14 @@ function runStage() {
 
     words(scrollY); chrome(PofY(scrollY), scrollY);
 
-    // hold a steady frame rate: step resolution down if frames run long, back up if there is room
-    if (dt > 0.03) { slow++; fast = 0; } else { fast++; if (fast > 240) slow = 0; }
-    if (slow > 40 && quality > 0.55) { quality = Math.max(0.55, quality - 0.15); slow = 0; layout(); }
+    // Hold a steady frame rate. Judged over four-second windows so one hitch changes nothing:
+    // a window that is mostly long frames steps resolution down, a clean one steps it back up.
+    if (dt > 0.03) slow++;
+    if (++fast >= 240) {
+      if (slow > 90 && quality > 0.6) { quality = Math.max(0.6, quality - 0.15); layout(); }
+      else if (slow < 3 && quality < 1 && raises < 2) { quality = Math.min(1, quality + 0.15); raises++; layout(); }
+      slow = 0; fast = 0;
+    }
   }
   window.addEventListener('scroll', () => { scrollY = window.scrollY; }, { passive: true });
   let rw = window.innerWidth, rt = 0;
