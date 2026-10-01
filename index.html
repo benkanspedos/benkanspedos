@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ben Kanspedos · Applied AI Consulting · Essential Concepts LLC</title>
 <meta name="description" content="Companies have AI now and little to show for it. I find where it actually pays off, build the workflows, and make them stick. Applied AI consulting by Ben Kanspedos, Essential Concepts LLC, Tucson AZ.">
+<meta name="theme-color" content="#15133A">
 <meta property="og:title" content="Ben Kanspedos · Applied AI Consulting">
 <meta property="og:description" content="I find where AI actually pays off, build the workflows, and make them stick.">
 <meta property="og:type" content="website">
@@ -17,323 +18,408 @@
 <meta name="twitter:title" content="Ben Kanspedos · Applied AI Consulting">
 <meta name="twitter:description" content="I find where AI actually pays off, build the workflows, and make them stick.">
 <meta name="twitter:image" content="https://benkanspedos.com/og-image.png">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2335573C'/%3E%3Ccircle cx='16' cy='8' r='2.6' fill='%23F1F2EC'/%3E%3Ccircle cx='16' cy='16' r='2.6' fill='%23F1F2EC'/%3E%3Ccircle cx='16' cy='24' r='2.6' fill='%23B4552B'/%3E%3Cpath d='M16 10.6v2.8m0 5.2v2.8' stroke='%23F1F2EC' stroke-width='1.4'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231E1A40'/%3E%3Cg fill='%23423A7A'%3E%3Crect x='6' y='6' width='5.5' height='5.5'/%3E%3Crect x='13.25' y='6' width='5.5' height='5.5'/%3E%3Crect x='20.5' y='6' width='5.5' height='5.5'/%3E%3Crect x='6' y='13.25' width='5.5' height='5.5'/%3E%3Crect x='20.5' y='13.25' width='5.5' height='5.5'/%3E%3Crect x='6' y='20.5' width='5.5' height='5.5'/%3E%3Crect x='13.25' y='20.5' width='5.5' height='5.5'/%3E%3Crect x='20.5' y='20.5' width='5.5' height='5.5'/%3E%3C/g%3E%3Crect x='13.25' y='13.25' width='5.5' height='5.5' fill='%23FFD779'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Hanken+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+/* Pick the mode before first paint. "live" is the scroll-driven scene; "still" is the
+   same page as a plain illustrated article (reduced motion). No class at all is the
+   no-script page, which reads fine on its own. */
+(function(){
+  var r=document.documentElement;
+  var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var ok=!!window.requestAnimationFrame&&!!document.createElement("canvas").getContext;
+  r.className=ok?(reduce?"still":"live"):"";
+})();
+</script>
 <style>
 :root{
-  --paper:#F1F2EC;
-  --ink:#212A20;
-  --green:#35573C;
-  --green-deep:#27402C;
-  --clay:#B4552B;
-  --mist:#DFE2D5;
-  --faint:#5C6659;
-  --max:72rem;
+  --night:#0E0C22;
+  --ink:#16132E;
+  --plum:#241F4A;
+  --text:#F7F0E5;
+  --soft:#E3DCEE;
+  --muted:#B4ADCB;
+  --gold:#FFD779;
+  --gold-hot:#FFEBB5;
+  --line:rgba(247,240,229,.18);
+  --display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --body:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --edge:clamp(1.5rem,6.5vw,7rem);
+  --u:1vh;
+  --pintop:16;
+  --pinh:68;
 }
+@supports (height:1svh){:root{--u:1svh}}
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+html{background:var(--night);-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html.live{scroll-behavior:smooth}
 body{
-  background:var(--paper);
-  color:var(--ink);
-  font-family:"Source Serif 4",Georgia,serif;
-  font-size:1.125rem;
-  line-height:1.65;
+  color:var(--text);
+  font-family:var(--body);
+  font-size:1.0625rem;
+  line-height:1.6;
   -webkit-font-smoothing:antialiased;
+  background:var(--night);
+  overflow-x:hidden;
 }
-::selection{background:var(--clay);color:var(--paper)}
-a{color:var(--green);text-decoration-thickness:1px;text-underline-offset:3px}
-a:hover{color:var(--green-deep)}
-a:focus-visible,button:focus-visible{outline:3px solid var(--clay);outline-offset:3px;border-radius:2px}
-.wrap{max-width:var(--max);margin:0 auto;padding:0 1.5rem}
-.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+::selection{background:var(--gold);color:var(--ink)}
+a{color:var(--gold);text-decoration-thickness:1px;text-underline-offset:3px}
+a:hover{color:var(--gold-hot)}
+a:focus-visible{outline:3px solid var(--gold-hot);outline-offset:3px;border-radius:3px}
 
-/* header */
-header{padding:1.6rem 0}
-header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1rem}
-.mark{display:flex;align-items:center;gap:.65rem;text-decoration:none;color:var(--ink)}
-.mark svg{display:block}
-.mark span{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:1.02rem;letter-spacing:-.01em}
-header nav a{margin-left:1.4rem;font-family:"IBM Plex Mono",monospace;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;color:var(--faint)}
-header nav a:hover{color:var(--green)}
-@media(max-width:40rem){header nav{display:none}}
+/* ---------- the scene (live mode only) ---------- */
+#scene{display:none}
+.scrim,.depth,.cue{display:none}
+html.live #scene{
+  display:block;position:fixed;top:0;left:0;z-index:0;
+  width:100vw;height:100vh;height:100lvh;
+}
+html.live .scrim{
+  display:block;position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;
+  background:linear-gradient(90deg,rgba(12,10,30,.97) 0%,rgba(12,10,30,.95) 33%,rgba(12,10,30,.72) 41%,rgba(12,10,30,0) 53%);
+}
 
-/* hero */
-.hero{padding:5.5rem 0 6rem}
-.hero .mono{margin-bottom:1.6rem;display:block}
-h1{
-  font-family:"Bricolage Grotesque",sans-serif;
-  font-weight:800;
-  font-size:clamp(2.5rem,6.4vw,4.9rem);
-  line-height:1.02;
-  letter-spacing:-.025em;
-  max-width:20ch;
+/* ---------- header ---------- */
+header{
+  position:fixed;top:0;left:0;right:0;z-index:30;
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  padding:1.1rem var(--edge) 2rem;
+  background:linear-gradient(rgba(12,10,30,.94) 0%,rgba(12,10,30,.86) 52%,rgba(12,10,30,0) 100%);
+  pointer-events:none;
 }
-.hero .sub{
-  margin-top:1.9rem;
-  font-size:clamp(1.2rem,2.2vw,1.5rem);
-  line-height:1.5;
-  max-width:34ch;
-}
-.hero .sub b{font-weight:600;color:var(--green-deep)}
-.cta-row{margin-top:2.6rem;display:flex;align-items:center;gap:1.6rem;flex-wrap:wrap}
+header > *{pointer-events:auto}
+.mark{display:flex;align-items:center;gap:.6rem;text-decoration:none;color:var(--text)}
+.mark svg{display:block;flex:none}
+.mark span{font-family:var(--display);font-weight:800;font-size:1.25rem;letter-spacing:.02em;text-transform:uppercase;line-height:1}
+header nav{display:flex;align-items:center;gap:1.5rem}
+header nav a{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:var(--muted)}
+header nav a:hover{color:var(--gold)}
+header nav a.btn{color:var(--ink)}
 .btn{
   display:inline-block;
-  font-family:"Bricolage Grotesque",sans-serif;
-  font-weight:700;
-  font-size:1.02rem;
-  color:var(--paper);
-  background:var(--green);
-  padding:.85rem 1.6rem;
-  border-radius:.35rem;
-  text-decoration:none;
-  transition:background .15s ease;
+  font-family:var(--body);font-weight:600;font-size:1rem;line-height:1.2;
+  color:var(--ink);background:var(--gold);
+  padding:.8rem 1.35rem;border-radius:5px;text-decoration:none;
+  transition:background .15s ease,transform .15s ease;
 }
-.btn:hover{background:var(--green-deep);color:var(--paper)}
-.cta-row .quiet{font-family:"IBM Plex Mono",monospace;font-size:.85rem;letter-spacing:.04em}
+.btn:hover{background:var(--gold-hot);color:var(--ink)}
+.btn:active{transform:translateY(1px)}
+.btn.small{font-family:var(--mono);font-weight:500;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;padding:.6rem .95rem}
 
-/* process rail */
-.process{padding:1rem 0 4.5rem}
-.stage{
-  display:grid;
-  grid-template-columns:4rem 1fr;
-  gap:0 1.6rem;
-  max-width:56rem;
+/* ---------- type ---------- */
+.eyebrow{
+  display:block;font-family:var(--mono);font-weight:500;font-size:.72rem;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;
 }
-.rail{position:relative;display:flex;justify-content:center}
-.rail::before{
-  content:"";
-  position:absolute;
-  top:0;bottom:0;left:50%;
-  width:2px;
-  transform:translateX(-50%);
-  background:var(--mist);
+h1{
+  font-family:var(--display);font-weight:900;text-transform:uppercase;
+  font-size:clamp(3.15rem,7.4vw,7.4rem);line-height:.9;letter-spacing:.005em;
+  text-wrap:balance;
 }
-.stage:first-child .rail::before{top:.6rem}
-.stage:last-child .rail::before{bottom:auto;height:.6rem}
-.node{
-  position:relative;z-index:1;
-  width:1rem;height:1rem;
-  margin-top:.55rem;
-  border-radius:50%;
-  background:var(--paper);
-  border:3px solid var(--green);
-}
-.stage.stick .node{border-color:var(--clay)}
-.stage-body{padding:0 0 3.6rem}
-.stage:last-child .stage-body{padding-bottom:.5rem}
-.stage .mono{display:block;margin-bottom:.5rem}
 h2{
-  font-family:"Bricolage Grotesque",sans-serif;
-  font-weight:700;
-  font-size:clamp(1.55rem,3vw,2.1rem);
-  letter-spacing:-.015em;
-  line-height:1.15;
-  max-width:24ch;
+  font-family:var(--display);font-weight:800;text-transform:uppercase;
+  font-size:clamp(2.2rem,3.5vw,3.5rem);line-height:.96;letter-spacing:.01em;
+  text-wrap:balance;
 }
-.stage p{margin-top:.9rem;max-width:58ch}
-@media(max-width:40rem){
-  .stage{grid-template-columns:2.2rem 1fr;gap:0 1rem}
+h3{
+  font-family:var(--display);font-weight:800;text-transform:uppercase;
+  font-size:clamp(1.55rem,2vw,1.95rem);line-height:1;letter-spacing:.02em;color:var(--gold);
 }
+.card p{margin-top:1rem;color:var(--soft);max-width:33rem;text-wrap:pretty}
+.card h2 + h3,.card .eyebrow + h3{margin-top:0}
+.card h2 + .eyebrow{margin-top:1.5rem;margin-bottom:.5rem}
+.card h2 + h3{margin-top:1.4rem}
+.sub{font-size:clamp(1.15rem,1.65vw,1.45rem);line-height:1.45;max-width:30rem}
+.sub b{font-weight:600;color:var(--gold)}
+.cta-row{margin-top:1.8rem;display:flex;align-items:center;gap:1.4rem;flex-wrap:wrap}
+.quiet{font-family:var(--mono);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase}
 
-/* reveal */
-.reveal{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
-.reveal.in{opacity:1;transform:none}
-@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
-
-/* receipts */
-.receipts{background:var(--ink);color:var(--paper);padding:4.5rem 0}
-.receipts h2{color:var(--paper)}
-.receipts .mono{color:#9AA694}
-.receipt-grid{margin-top:2.4rem;display:grid;grid-template-columns:repeat(3,1fr);gap:2.4rem}
-.receipt h3{
-  font-family:"Bricolage Grotesque",sans-serif;
-  font-weight:700;font-size:1.12rem;letter-spacing:-.01em;
-  padding-top:.9rem;border-top:2px solid var(--green);
+/* ---------- default layout: a plain article (no script, or reduced motion) ---------- */
+main{position:relative;z-index:2;padding-top:5.5rem}
+.beat{max-width:44rem;margin:0 auto;padding:2.2rem 1.25rem}
+.beat.is-hero{padding-top:2.5rem}
+.still{
+  display:block;width:100%;aspect-ratio:4/3;border-radius:6px;overflow:hidden;
+  margin-bottom:1.5rem;background:#15133A;
 }
-.receipts .receipt:last-child h3{border-top-color:var(--clay)}
-.receipt p{margin-top:.7rem;font-size:1rem;line-height:1.6;color:#CDD3C6}
-@media(max-width:48rem){.receipt-grid{grid-template-columns:1fr}}
+.still canvas{display:block;width:100%;height:100%}
+.still.after{margin:1.8rem 0 0}
+html:not(.live) header{background:rgba(14,12,34,.97);padding-bottom:1.1rem;border-bottom:1px solid var(--line)}
+footer{position:relative;z-index:2;border-top:1px solid var(--line);margin-top:2rem;padding:1.6rem var(--edge) 2.2rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+footer p{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+footer a{color:var(--muted)}
+footer a:hover{color:var(--gold)}
 
-/* engagement */
-.engage{padding:4.5rem 0}
-.engage .mono{display:block;margin-bottom:.5rem}
-.steps{margin-top:2.2rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem}
-.step{
-  border:1px solid var(--mist);
-  background:#FFFFFF66;
-  border-radius:.45rem;
-  padding:1.5rem 1.4rem 1.6rem;
+/* ---------- live layout: pinned cards over the scene ---------- */
+html.live main{padding-top:0}
+html.live .beat{
+  max-width:none;margin:0;padding:0;position:relative;
+  padding-top:calc(var(--gap,0)*var(--u));
+  min-height:calc((var(--pinh) + var(--dwell,80) + var(--gap,0))*var(--u));
 }
-.step .mono{margin-bottom:.9rem}
-.step h3{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:1.15rem;letter-spacing:-.01em}
-.step p{margin-top:.6rem;font-size:1rem;line-height:1.6}
-@media(max-width:48rem){.steps{grid-template-columns:1fr}}
-
-/* contact */
-.contact{padding:3.5rem 0 6rem}
-.contact .card{
-  border-top:3px solid var(--green);
-  max-width:56rem;
-  padding-top:2.2rem;
+html.live .pin{
+  position:sticky;top:calc(var(--pintop)*var(--u));height:calc(var(--pinh)*var(--u));
+  display:flex;align-items:center;pointer-events:none;
 }
-.contact p{margin-top:1rem;max-width:52ch}
-.contact .cta-row{margin-top:1.8rem}
+html.live .card{
+  pointer-events:auto;width:min(30rem,35vw);margin-left:var(--edge);
+  will-change:opacity;
+}
+html.live .beat.is-hero{--pintop:0;--pinh:100}
+html.live .beat.is-hero .pin{align-items:flex-start;padding-top:clamp(5.5rem,15vh,9.5rem)}
+html.live .beat.is-hero .card{width:min(58rem,64vw)}
+html.live .beat.is-end .pin{padding-top:clamp(5.5rem,17vh,10rem)}
+html.live .beat.is-end .card{width:min(40rem,52vw)}
+html.live footer{
+  margin-top:0;border-top:0;
+  background:linear-gradient(rgba(12,10,30,0),rgba(12,10,30,.9) 55%);
+  padding-top:3rem;
+}
+html.live .depth{
+  display:flex;position:fixed;z-index:20;left:var(--edge);bottom:1.4rem;
+  align-items:baseline;gap:1.1rem;pointer-events:none;
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+}
+.depth .mag{color:var(--gold);font-weight:500;min-width:5.2em;font-variant-numeric:tabular-nums}
+.depth ol{list-style:none;display:flex;gap:.9rem}
+.depth li{opacity:.45;transition:opacity .25s ease,color .25s ease}
+.depth li.on{opacity:1;color:var(--text)}
+html.live .cue{
+  display:flex;position:absolute;right:var(--edge);bottom:calc(1.1rem + env(safe-area-inset-bottom,0px));
+  align-items:center;gap:.7rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--text);
+}
+.cue i{display:block;width:1px;height:2.2rem;background:var(--line);position:relative;overflow:hidden}
+.cue i::after{content:"";position:absolute;left:0;top:-50%;width:100%;height:50%;background:var(--gold);animation:drip 1.8s cubic-bezier(.6,0,.3,1) infinite}
+@keyframes drip{to{top:110%}}
 
-/* footer */
-footer{border-top:1px solid var(--mist);padding:1.8rem 0 2.4rem}
-footer .wrap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
-footer p{font-family:"IBM Plex Mono",monospace;font-size:.78rem;letter-spacing:.06em;color:var(--faint)}
-footer a{color:var(--faint)}
-footer a:hover{color:var(--green)}
+/* ---------- phone ---------- */
+@media (max-width:820px){
+  :root{--edge:1.25rem;--pintop:51;--pinh:47}
+  header{padding:.8rem var(--edge) 1.6rem}
+  html:not(.live) header{padding-bottom:.8rem}
+  header nav a:not(.btn){display:none}
+  .mark span{font-size:1.1rem}
+  body{font-size:1rem;line-height:1.55}
+  h1{font-size:clamp(2.9rem,14.4vw,4.6rem)}
+  h2{font-size:clamp(1.95rem,8.6vw,2.6rem)}
+  h3{font-size:1.5rem}
+  .eyebrow{margin-bottom:.7rem;font-size:.68rem}
+  .card p{margin-top:.75rem}
+  .sub{font-size:1.1rem}
+  /* on a phone the text sits under the scene, and each card carries its own backdrop
+     so the scene can use all the room a short card leaves */
+  html.live .scrim{display:none}
+  html.live .pin{align-items:flex-end}
+  html.live .card{position:relative;width:100%;margin-left:0;padding:0 var(--edge)}
+  html.live .beat:not(.is-hero) .card::before{
+    content:"";position:absolute;z-index:-1;left:0;right:0;top:-3.6rem;bottom:-40vh;pointer-events:none;
+    background:linear-gradient(180deg,rgba(12,10,30,0) 0,rgba(12,10,30,.9) 3rem,rgba(12,10,30,.97) 5.5rem);
+  }
+  html.live .beat.is-hero .pin{align-items:flex-start;padding-top:6.1rem}
+  html.live .beat.is-hero .card,html.live .beat.is-end .card{width:100%}
+  html.live .depth{
+    left:calc(var(--edge) - .45rem);bottom:auto;top:3.55rem;gap:.6rem;font-size:.62rem;
+    background:rgba(12,10,30,.7);padding:.22rem .45rem;border-radius:3px;
+  }
+  .depth .mag{min-width:0}
+  .depth li{display:none}
+  .depth li.on{display:block}
+  html.live .cue{bottom:calc(1.1rem + env(safe-area-inset-bottom,0px))}
+  .cta-row{margin-top:1.3rem;gap:1.1rem}
+}
+@media (max-width:820px) and (max-height:700px){
+  h1{font-size:clamp(2.6rem,12.6vw,3.6rem)}
+  h2{font-size:clamp(1.7rem,7.4vw,2.2rem)}
+  body{font-size:.95rem}
+}
+@media (min-width:821px) and (max-height:640px){
+  h1{font-size:clamp(2.6rem,9.5vh,4.4rem)}
+  h2{font-size:clamp(1.7rem,6.4vh,2.4rem)}
+  body{font-size:.95rem;line-height:1.5}
+  html.live .beat.is-hero .pin{padding-top:4.6rem}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .cue i::after{animation:none}
+}
 </style>
 </head>
 <body>
 
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="scrim" aria-hidden="true"></div>
+
 <header>
-  <div class="wrap">
-    <a class="mark" href="#top" aria-label="Ben Kanspedos home">
-      <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#35573C"/><circle cx="16" cy="8" r="2.6" fill="#F1F2EC"/><circle cx="16" cy="16" r="2.6" fill="#F1F2EC"/><circle cx="16" cy="24" r="2.6" fill="#B4552B"/><path d="M16 10.6v2.8m0 5.2v2.8" stroke="#F1F2EC" stroke-width="1.4"/></svg>
-      <span>Ben Kanspedos</span>
-    </a>
-    <nav aria-label="Sections">
-      <a href="#how">How I work</a>
-      <a href="#receipts">Receipts</a>
-      <a href="#start">Start</a>
-    </nav>
-  </div>
+  <a class="mark" href="#top" aria-label="Ben Kanspedos, back to top">
+    <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="6" fill="#1E1A40"/><g fill="#423A7A"><rect x="6" y="6" width="5.5" height="5.5"/><rect x="13.25" y="6" width="5.5" height="5.5"/><rect x="20.5" y="6" width="5.5" height="5.5"/><rect x="6" y="13.25" width="5.5" height="5.5"/><rect x="20.5" y="13.25" width="5.5" height="5.5"/><rect x="6" y="20.5" width="5.5" height="5.5"/><rect x="13.25" y="20.5" width="5.5" height="5.5"/><rect x="20.5" y="20.5" width="5.5" height="5.5"/></g><rect x="13.25" y="13.25" width="5.5" height="5.5" fill="#FFD779"/></svg>
+    <span>Ben Kanspedos</span>
+  </a>
+  <nav aria-label="Sections">
+    <a href="#how">How I work</a>
+    <a href="#receipts">Receipts</a>
+    <a href="#start">Start</a>
+    <a class="btn small" href="mailto:ben.kanspedos@gmail.com?subject=The%20task%20my%20team%20hates">Email Ben</a>
+  </nav>
 </header>
 
+<div class="depth" aria-hidden="true">
+  <span class="mag" id="mag">&times;1</span>
+  <ol id="levels">
+    <li class="on">Portfolio</li>
+    <li>Building</li>
+    <li>Desk</li>
+    <li>Screen</li>
+    <li>Workflow</li>
+  </ol>
+</div>
+
 <main id="top">
-  <section class="hero">
-    <div class="wrap">
-      <span class="mono">Applied AI consulting · Essential Concepts LLC · Tucson, AZ</span>
-      <h1>Companies have AI now and little to show for it.</h1>
-      <p class="sub">I <b>find</b> where it actually pays off in your business, <b>build</b> the workflows, and <b>make them stick</b>.</p>
-      <div class="cta-row">
-        <a class="btn" href="mailto:ben.kanspedos@gmail.com?subject=The%20task%20my%20team%20hates">Email Ben</a>
-        <a class="quiet" href="https://www.linkedin.com/in/ben-kanspedos-082b446" rel="me">LinkedIn</a>
-      </div>
-    </div>
-  </section>
 
-  <section class="process" id="how" aria-label="How I work">
-    <div class="wrap">
-
-      <div class="stage reveal">
-        <div class="rail"><div class="node" aria-hidden="true"></div></div>
-        <div class="stage-body">
-          <span class="mono">01 · Find</span>
-          <h2>Start with the constraint, not the tool.</h2>
-          <p>Somewhere in your business, someone is doing the same task by hand fifty times a week. Somewhere else, an AI pilot you already paid for sits on a shelf. The first step is a diagnosis: map where the time and money actually go, then find the few places where automation genuinely pays. Sometimes the fix is AI. Sometimes it is killing a handoff. The diagnosis decides, not the tool.</p>
-        </div>
-      </div>
-
-      <div class="stage reveal">
-        <div class="rail"><div class="node" aria-hidden="true"></div></div>
-        <div class="stage-body">
-          <span class="mono">02 · Build</span>
-          <h2>Working automation, in production, on your systems.</h2>
-          <p>I build the thing, not a strategy deck about the thing. Claude-driven document pipelines, agent workflows, review gates, and the unglamorous glue between the tools your team already runs. No new platform to babysit, no ML team to hire.</p>
-        </div>
-      </div>
-
-      <div class="stage stick reveal">
-        <div class="rail"><div class="node" aria-hidden="true"></div></div>
-        <div class="stage-body">
-          <span class="mono">03 · Stick</span>
-          <h2>Adoption is a learning problem, not a software problem.</h2>
-          <p>This is the part most AI projects skip, and the reason most of them stall. I spent thirteen years in instructional design before anyone called this work AI. Every build ships with what your team needs to run it without me: documentation, job aids, working sessions with the people who own it. When I leave, the system is yours. That is the point.</p>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <section class="receipts" id="receipts">
-    <div class="wrap">
-      <span class="mono">Receipts</span>
-      <h2>Built, shipped, and running today.</h2>
-      <div class="receipt-grid">
-        <div class="receipt reveal">
-          <h3>21 years at Intuit</h3>
-          <p>Staff program manager across TurboTax and enterprise learning. My last two years: building agentic AI systems used by a 20,000-person customer service organization.</p>
-        </div>
-        <div class="receipt reveal">
-          <h3>Production SaaS</h3>
-          <p>Lead developer of ConvoWize, an AI conversation-coaching product built with two partners and live today, from architecture through billing.</p>
-        </div>
-        <div class="receipt reveal">
-          <h3>Client work in production now</h3>
-          <p>Document automation for a commercial real estate firm. An AI course-development engine for an e-learning vendor. Paid engagements, deployed, owned by the client.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="engage" id="start">
-    <div class="wrap">
-      <span class="mono">How an engagement works</span>
-      <h2>Small first step. Value before commitment.</h2>
-      <div class="steps">
-        <div class="step reveal">
-          <span class="mono">Step 1</span>
-          <h3>Diagnostic</h3>
-          <p>A short, structured look at where your team's time actually goes. You get a written map of the highest-payoff opportunities, useful whether or not we go further.</p>
-        </div>
-        <div class="step reveal">
-          <span class="mono">Step 2</span>
-          <h3>The quick win</h3>
-          <p>One workflow, fixed scope, fixed price, shipped to production. Priced on the value it returns, not the hours it takes.</p>
-        </div>
-        <div class="step reveal">
-          <span class="mono">Step 3</span>
-          <h3>Expand if it earns it</h3>
-          <p>Once the first win is running, we decide together what deserves the next build. A retainer when it makes sense. No lock-in.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="contact">
-    <div class="wrap">
+  <section class="beat is-hero" data-beat="hero" style="--dwell:55" aria-labelledby="h-hero">
+    <div class="pin">
       <div class="card">
-        <h2>Tell me about the task your team hates.</h2>
-        <p>Two sentences about the work that eats your week is enough to start. If I am not the right fit, I will say so and point you somewhere better.</p>
+        <span class="eyebrow">Applied AI consulting · Essential Concepts LLC · Tucson, AZ</span>
+        <h1 id="h-hero">Companies have AI now and little to show for it.</h1>
+        <p class="sub">I <b>find</b> where it actually pays off in your business, <b>build</b> the workflows, and <b>make them stick</b>.</p>
         <div class="cta-row">
-          <a class="btn" href="mailto:ben.kanspedos@gmail.com?subject=The%20task%20my%20team%20hates">ben.kanspedos@gmail.com</a>
+          <a class="btn" href="mailto:ben.kanspedos@gmail.com?subject=The%20task%20my%20team%20hates">Email Ben</a>
           <a class="quiet" href="https://www.linkedin.com/in/ben-kanspedos-082b446" rel="me">LinkedIn</a>
         </div>
       </div>
+      <div class="cue" aria-hidden="true"><i></i>Scroll to zoom in</div>
     </div>
   </section>
+
+  <section id="how" aria-label="How I work">
+
+    <div class="beat" data-beat="findA" style="--dwell:105">
+      <div class="pin"><div class="card">
+        <span class="eyebrow">01 · Find</span>
+        <h2>Start with the constraint, not the tool.</h2>
+        <p>Somewhere in your business, someone is doing the same task by hand fifty times a week. Somewhere else, an AI pilot you already paid for sits on a shelf.</p>
+      </div></div>
+    </div>
+
+    <div class="beat" data-beat="findB" style="--dwell:95">
+      <div class="pin"><div class="card">
+        <span class="eyebrow">01 · Find</span>
+        <p>The first step is a diagnosis: map where the time and money actually go, then find the few places where automation genuinely pays. Sometimes the fix is AI. Sometimes it is killing a handoff. The diagnosis decides, not the tool.</p>
+      </div></div>
+    </div>
+
+    <div class="beat" data-beat="buildA" style="--dwell:90">
+      <div class="pin"><div class="card">
+        <span class="eyebrow">02 · Build</span>
+        <h2>Working automation, in production, on your systems.</h2>
+        <p>I build the thing, not a strategy deck about the thing.</p>
+      </div></div>
+    </div>
+
+    <div class="beat" data-beat="buildB" style="--dwell:125">
+      <div class="pin"><div class="card">
+        <span class="eyebrow">02 · Build</span>
+        <p>Claude-driven document pipelines, agent workflows, review gates, and the unglamorous glue between the tools your team already runs. No new platform to babysit, no ML team to hire.</p>
+      </div></div>
+    </div>
+
+    <div class="beat" data-beat="stickA" style="--dwell:105;--gap:45">
+      <div class="pin"><div class="card">
+        <span class="eyebrow">03 · Stick</span>
+        <h2>Adoption is a learning problem, not a software problem.</h2>
+        <p>This is the part most AI projects skip, and the reason most of them stall. I spent thirteen years in instructional design before anyone called this work AI.</p>
+      </div></div>
+    </div>
+
+    <div class="beat" data-beat="stickB" style="--dwell:125">
+      <div class="pin"><div class="card">
+        <span class="eyebrow">03 · Stick</span>
+        <p>Every build ships with what your team needs to run it without me: documentation, job aids, working sessions with the people who own it. When I leave, the system is yours. That is the point.</p>
+      </div></div>
+    </div>
+
+  </section>
+
+  <section id="receipts" aria-label="Receipts">
+
+    <div class="beat" data-beat="rec1" style="--dwell:85">
+      <div class="pin"><div class="card">
+        <span class="eyebrow">Receipts</span>
+        <h2>Built, shipped, and running today.</h2>
+        <h3>21 years at Intuit</h3>
+        <p>Staff program manager across TurboTax and enterprise learning. My last two years: building agentic AI systems used by a 20,000-person customer service organization.</p>
+      </div></div>
+    </div>
+
+    <div class="beat" data-beat="rec2" style="--dwell:75">
+      <div class="pin"><div class="card">
+        <span class="eyebrow">Receipts</span>
+        <h3>Production SaaS</h3>
+        <p>Lead developer of ConvoWize, an AI conversation-coaching product built with two partners and live today, from architecture through billing.</p>
+      </div></div>
+    </div>
+
+    <div class="beat" data-beat="rec3" style="--dwell:75">
+      <div class="pin"><div class="card">
+        <span class="eyebrow">Receipts</span>
+        <h3>Client work in production now</h3>
+        <p>Document automation for a commercial real estate firm. An AI course-development engine for an e-learning vendor. Paid engagements, deployed, owned by the client.</p>
+      </div></div>
+    </div>
+
+  </section>
+
+  <section id="start" aria-label="How an engagement works">
+
+    <div class="beat" data-beat="eng1" style="--dwell:85">
+      <div class="pin"><div class="card">
+        <span class="eyebrow">How an engagement works</span>
+        <h2>Small first step. Value before commitment.</h2>
+        <span class="eyebrow">Step 1</span>
+        <h3>Diagnostic</h3>
+        <p>A short, structured look at where your team's time actually goes. You get a written map of the highest-payoff opportunities, useful whether or not we go further.</p>
+      </div></div>
+    </div>
+
+    <div class="beat" data-beat="eng2" style="--dwell:70">
+      <div class="pin"><div class="card">
+        <span class="eyebrow">Step 2</span>
+        <h3>The quick win</h3>
+        <p>One workflow, fixed scope, fixed price, shipped to production. Priced on the value it returns, not the hours it takes.</p>
+      </div></div>
+    </div>
+
+    <div class="beat" data-beat="eng3" style="--dwell:70">
+      <div class="pin"><div class="card">
+        <span class="eyebrow">Step 3</span>
+        <h3>Expand if it earns it</h3>
+        <p>Once the first win is running, we decide together what deserves the next build. A retainer when it makes sense. No lock-in.</p>
+      </div></div>
+    </div>
+
+  </section>
+
+  <section class="beat is-hero is-end" id="contact" data-beat="contact" style="--dwell:55" aria-labelledby="h-contact">
+    <div class="pin"><div class="card">
+      <h2 id="h-contact">Tell me about the task your team hates.</h2>
+      <p>Two sentences about the work that eats your week is enough to start. If I am not the right fit, I will say so and point you somewhere better.</p>
+      <div class="cta-row">
+        <a class="btn" href="mailto:ben.kanspedos@gmail.com?subject=The%20task%20my%20team%20hates">ben.kanspedos@gmail.com</a>
+        <a class="quiet" href="https://www.linkedin.com/in/ben-kanspedos-082b446" rel="me">LinkedIn</a>
+      </div>
+    </div></div>
+  </section>
+
 </main>
 
 <footer>
-  <div class="wrap">
-    <p>Essential Concepts LLC · Tucson, Arizona</p>
-    <p><a href="mailto:ben.kanspedos@gmail.com">Email</a> · <a href="https://www.linkedin.com/in/ben-kanspedos-082b446" rel="me">LinkedIn</a></p>
-  </div>
+  <p>Essential Concepts LLC · Tucson, Arizona</p>
+  <p><a href="mailto:ben.kanspedos@gmail.com">Email</a> · <a href="https://www.linkedin.com/in/ben-kanspedos-082b446" rel="me">LinkedIn</a></p>
 </footer>
 
-<script>
-(function(){
-  var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var els=document.querySelectorAll(".reveal");
-  if(reduce||!("IntersectionObserver" in window)){
-    els.forEach(function(el){el.classList.add("in")});
-    return;
-  }
-  var io=new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}
-    });
-  },{threshold:.18});
-  els.forEach(function(el){io.observe(el)});
-})();
-</script>
-
+<script src="scene.js"></script>
 </body>
 </html>
