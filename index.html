@@ -34,6 +34,9 @@
   if(/[?&]live(=|&|$)/.test(location.search))reduce=false;
   var ok=!!window.requestAnimationFrame&&!!document.createElement("canvas").getContext;
   r.className=ok?(reduce?"still":"live"):"";
+  /* Netlify puts its own toolbar along the bottom of deploy previews. Leave it room there;
+     the live domain never gets this class. */
+  if(location.hostname.indexOf("deploy-preview-")===0)r.className+=" preview";
 })();
 </script>
 <style>
@@ -199,6 +202,8 @@ html.live .cue{
 .cue i{display:block;width:1px;height:2.2rem;background:var(--line);position:relative;overflow:hidden}
 .cue i::after{content:"";position:absolute;left:0;top:-50%;width:100%;height:50%;background:var(--gold);animation:drip 1.8s cubic-bezier(.6,0,.3,1) infinite}
 @keyframes drip{to{top:110%}}
+html.preview.live .depth{bottom:4.3rem}
+html.preview.live .cue{bottom:4.3rem}
 html.live .beat.is-hero:not(.is-end) .card > *{animation:arrive .8s cubic-bezier(.2,.7,.2,1) both}
 html.live .beat.is-hero:not(.is-end) .card > h1{animation-delay:.12s}
 html.live .beat.is-hero:not(.is-end) .card > .sub{animation-delay:.3s}
@@ -235,6 +240,9 @@ html.live .beat.is-hero:not(.is-end) .card > .cta-row{animation-delay:.45s}
     background:rgba(12,10,30,.7);padding:.22rem .45rem;border-radius:3px;
   }
   .depth .mag{min-width:0}
+  html.preview{--pinh:41}
+  html.preview.live .depth{bottom:auto}
+  html.preview footer{padding-bottom:5rem}
   .depth li{display:none}
   .depth li.on{display:block}
   html.live .cue{bottom:calc(1.1rem + env(safe-area-inset-bottom,0px))}

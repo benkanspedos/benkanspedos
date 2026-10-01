@@ -213,9 +213,9 @@
       buildB: [pipe, push(L, pipe, 1.1, sp)],
       stickA: [fit(L, scr, st('stickA')), fit(L, office, st('stickA'))],
       stickB: [fit(L, three, st('stickB')), fit(L, bRect, st('stickB'))],
-      rec1: [fit(L, { x: 1640, y: 740, w: 1380, h: G - 740 }, st('rec1'), 1, true)],
-      rec2: [fit(L, { x: 1640, y: 740, w: 1780, h: G - 740 }, st('rec2'), 1, true)],
-      rec3: [fit(L, { x: 1480, y: 740, w: 2320, h: G - 740 }, st('rec3'), 1, true)],
+      rec1: [fit(L, { x: 1640, y: 640, w: 1380, h: G - 640 }, st('rec1'), 1, true)],
+      rec2: [fit(L, { x: 1640, y: 640, w: 1780, h: G - 640 }, st('rec2'), 1, true)],
+      rec3: [fit(L, { x: 1480, y: 640, w: 2320, h: G - 640 }, st('rec3'), 1, true)],
       eng1: [fit(L, eRect, st('eng1'))],
       eng2: [fit(L, qRect, st('eng2'))],
       eng3: [fit(L, eRect, st('eng3')), fit(L, { x: 880, y: 1080, w: 1420, h: 1080 }, st('eng3'))],
@@ -244,7 +244,7 @@
       scrim: r(0.55, 1.0) * (1 - r(12.55, 13.0)),
       ret: r(1.14, 1.3) * (1 - r(1.5, 1.7)),
       diag: r(2.12, 2.3) * (1 - r(2.5, 2.72)),
-      pb: r(4.03, 4.42),
+      pb: r(3.84, 4.4),
       adopt: r(4.42, 4.5),
       session: r(5.1, 5.42),
       litF: r(5.82, 6.5),
@@ -356,7 +356,8 @@
 
   function drawBuilding(ctx, L, T, S, t, b, officeOn) {
     var a = T.a, n = S.night, i, w;
-    var tone = mixc(TONE[b.tone], TONE_N[b.tone], n);
+    var tone = mixc(TONE[b.tone], TONE_N[b.tone], n), lift = b === ENG ? Math.max(S.survey, S.quick, S.expand) * 0.5 : 0;
+    if (lift > 0) tone = mixc(tone, [58, 50, 112], lift);
     ctx.fillStyle = css(tone); ctx.fillRect(b.x, b.top, b.w, b.h + 2);
     ctx.fillStyle = css(mixc(tone, [128, 112, 200], 0.2)); ctx.fillRect(b.x - 3, b.top, b.w + 6, 8);
     ctx.fillStyle = 'rgba(248,164,104,' + (0.6 * (1 - n * 0.92)).toFixed(3) + ')'; ctx.fillRect(b.x, b.top + 8, 3, b.h - 8);
@@ -389,7 +390,7 @@
     var wins = b.wins, nW = wins.length, g;
     var k = smooth(0.8, 1.15, a);   // 0: flat panes. 1: framed windows with a room behind each lit one
     if (k < 1) {
-      ctx.fillStyle = css(mixc(C.off, [26, 22, 54], n));
+      ctx.fillStyle = css(mixc(mixc(C.off, [26, 22, 54], n), [72, 64, 138], lift));
       ctx.beginPath();
       for (i = 0; i < nW; i++) { w = wins[i]; ctx.rect(w.x, w.y, w.w, w.h); }
       ctx.fill();
@@ -421,7 +422,7 @@
     }
     if (k <= 0) return;
     // close up: frames, sills, and a small room behind every lit pane
-    var frame = css(mixc([58, 51, 110], [40, 35, 84], n)), sill = css(mixc([92, 82, 160], [60, 53, 120], n));
+    var frame = css(mixc(mixc([58, 51, 110], [40, 35, 84], n), [86, 76, 156], lift)), sill = css(mixc(mixc([92, 82, 160], [60, 53, 120], n), [120, 108, 196], lift));
     for (i = 0; i < nW; i++) {
       w = wins[i];
       if (w.x > x1 || w.x + w.w < x0 || w.y > y1 || w.y + w.h < y0) continue;
@@ -441,7 +442,7 @@
           ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = k;
         }
       } else {
-        ctx.fillStyle = css(mixc([36, 31, 78], [24, 21, 52], n)); ctx.fillRect(w.x, w.y, w.w, w.h);
+        ctx.fillStyle = css(mixc(mixc([36, 31, 78], [24, 21, 52], n), [70, 62, 134], lift)); ctx.fillRect(w.x, w.y, w.w, w.h);
         ctx.fillStyle = 'rgba(170,150,230,.10)';
         ctx.beginPath(); ctx.moveTo(w.x, w.y); ctx.lineTo(w.x + w.w * 0.7, w.y); ctx.lineTo(w.x, w.y + w.h * 0.8); ctx.closePath(); ctx.fill();
         if (w.blinds) {
@@ -814,7 +815,7 @@
     setT(ctx, L, T);
     ctx.fillStyle = '#14112B'; ctx.fillRect(0, 0, PWD, PHT);
     // before the build, seen from the screen: one more field being typed by hand
-    var typing = (1 - smooth(0, 0.14, pb)) * (1 - smooth(L.w * 1.5, L.w * 4, px));
+    var typing = (1 - smooth(0, 0.14, pb)) * (1 - smooth(L.w * 0.45, L.w * 1.2, px));
     if (typing > 0.01) {
       var count = Math.floor(t * 3.2) % 10;
       ctx.globalAlpha = typing;
@@ -1105,7 +1106,7 @@
         beatEls.forEach(function (el, i) {
           var pin = el.querySelector('.pin'), o = parseFloat(getComputedStyle(pin).top) || 0;
           var top = (o + pin.offsetHeight - cards[i].offsetHeight) / h;
-          L.stages[BEATS[i]] = { x0: 0.05, x1: 0.95, y0: 0.105, y1: clamp(top - 0.06, 0.36, 0.64) };
+          L.stages[BEATS[i]] = { x0: 0.05, x1: 0.95, y0: 0.105, y1: clamp(top - 0.06, 0.36, 0.7) };
         });
         L.stage = L.stages.buildB;
       }
