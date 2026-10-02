@@ -192,11 +192,12 @@ footer a:hover{color:var(--green)}
 /* thread: one hairline drawn down the page on scroll, stringing the page's own rules
    together. The script at the end of the page builds it, and only when motion is allowed,
    so without it every rule above stays static. */
-/* each on its own layer: the tip moves without a repaint, and redrawing a stroke never
-   repaints the page beneath it */
-.thread,.thread-tip{position:absolute;top:0;left:0;pointer-events:none;will-change:transform}
-.thread{--hair:1}
-.thread path{fill:none;stroke:var(--green);stroke-width:var(--hair);stroke-linecap:round}
+/* One box holds the whole drawing, and its width is the page's own. Nothing inside it can
+   push the page wider than the screen, which on a rotated phone would shrink the whole
+   page to fit until the drawing was rebuilt. */
+.thread-box{position:absolute;top:0;left:0;right:0;overflow:hidden;pointer-events:none}
+.thread,.thread-tip{position:absolute;top:0;left:0}
+.thread path{fill:none;stroke:var(--green);stroke-linecap:round}
 /* where the thread runs along one of the page's rules, the rule is inked at its own weight
    (read from the rule itself by the script) and in its own colour */
 .thread .rule{stroke-linecap:butt}
@@ -204,8 +205,9 @@ footer a:hover{color:var(--green)}
 /* the one flourish: on the dark band each receipt rule arrives lit, then settles to its own colour */
 .thread .fresh{animation:thread-settle 1.8s ease-in-out}
 @keyframes thread-settle{0%,20%{stroke:var(--paper)}}
-/* the point the thread is being drawn from: the same dot that fills each rail node */
-.thread-tip{width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:var(--green);opacity:0;transition:opacity .4s ease}
+/* the point the thread is being drawn from: the same dot that fills each rail node. It has
+   its own layer, so moving it costs no repaint. */
+.thread-tip{width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:var(--green);opacity:0;transition:opacity .4s ease;will-change:transform}
 .thread-tip.on{opacity:1}
 .thread-tip.ink{background:var(--paper)}
 .node::after{
@@ -221,8 +223,10 @@ footer a:hover{color:var(--green)}
 @media screen{
   /* the thread inks these rules itself */
   .threaded .receipts .receipt h3,.threaded-card .contact .card{border-top-color:transparent}
+  /* the thread ends at this button: keep the button's focus ring above it */
+  .threaded .contact .btn{position:relative;z-index:1}
 }
-@media print{.thread,.thread-tip{display:none}}
+@media print{.thread-box,.node::after{display:none}}
 </style>
 </head>
 <body>
@@ -385,7 +389,8 @@ footer a:hover{color:var(--green)}
       btn=document.querySelector(".contact .btn");
   if(nodes.length<2||!rules.length||!band||!card||!btn)return;
 
-  var PEN=.72,   // how far down the viewport the line has been drawn
+  var HAIR=1,    // px: the thread's weight, before it is fitted to whole device pixels
+      PEN=.72,   // how far down the viewport the line has been drawn
       TAU=.1,    // seconds the line trails the scroll by
       ACC=4000,  // px/s2: eases the line into a long run
       VMAX=1200, // px/s: keeps a full-width run deliberate
@@ -393,13 +398,13 @@ footer a:hover{color:var(--green)}
 
   var NS="http://www.w3.org/2000/svg";
   function make(tag,cls){var e=document.createElementNS(NS,tag);if(cls)e.setAttribute("class",cls);return e}
-  var svg=make("svg","thread"),tip=document.createElement("i");
-  svg.setAttribute("aria-hidden","true");
-  tip.setAttribute("aria-hidden","true");
-  body.appendChild(svg);body.appendChild(tip);
+  var frame=document.createElement("div"),svg=make("svg","thread"),tip=document.createElement("i");
+  frame.className="thread-box";
+  frame.setAttribute("aria-hidden","true");
+  frame.appendChild(svg);frame.appendChild(tip);
+  body.appendChild(frame);
 
-  var HAIR=parseFloat(getComputedStyle(svg).getPropertyValue("--hair"))||1,
-      pieces=[],strokes=[],marks=[],total=0,endY=0,pageH=0,bandTop=0,bandBottom=0,
+  var pieces=[],strokes=[],marks=[],total=0,endY=0,pageH=0,laidW=0,bandTop=0,bandBottom=0,
       drawn=0,goal=0,vel=0,raf=0,last=0,queued=0,lit=0,dead=0,tipClass="";
   function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v))}
 
@@ -474,7 +479,8 @@ footer a:hover{color:var(--green)}
         gut=Math.min(32,c.l/2), // every corner lives in the page margin
         xl=mid(c.l-gut),xr=mid(W-c.l+gut),
         xrail=snap(n[0].l)+n[0].w/2,xn=mid(xrail),y0=n[0].t+n[0].h/2,
-        yj=(box(nodes[nodes.length-1].closest(".stage")).b+band_.t)/2,
+        railW=weight(getComputedStyle(nodes[0].parentNode,"::before").width),
+        yj=mid((box(nodes[nodes.length-1].closest(".stage")).b+band_.t)/2),
         pts=[[xn,y0],[xn,yj],[xl,yj]],rows=[],side=0;
 
     // the receipt rules, row by row, swept in alternate directions
@@ -485,11 +491,12 @@ footer a:hover{color:var(--green)}
     });
     rows.forEach(function(k){pts.push([side?xr:xl,k.y]);side^=1;pts.push([side?xr:xl,k.y])});
 
-    // the contact rule, then down to the email button
+    // the contact rule, then down to the email button (only while the button is the first
+    // thing on its row: with anything to its left the line would have to cross it)
     var barW=weight(getComputedStyle(card).borderTopWidth),bar=snap(c.t)+barW/2,yc=mid(bar),yb=b.t+b.h/2;
     pts.push([side?xr:xl,yc]);
     if(side)pts.push([xl,yc]);
-    pts.push([xl,yb],[b.l,yb]);
+    if(Math.abs(b.l-c.l)<1)pts.push([xl,yb],[b.l,yb]);
 
     // the route in pieces, straight runs and quarter-turn corners, each with its place
     // along the thread so the scroll can be mapped onto it
@@ -516,16 +523,17 @@ footer a:hover{color:var(--green)}
       run(p[0]-ux*rad,p[1]-uy*rad);
       run(p[0]+vx*rad,p[1]+vy*rad,rad,ux,uy,vx,vy,turn>0?1:0);
     }
-    total=len;endY=yb;bandTop=band_.t;bandBottom=band_.b;pageH=body.offsetHeight;
+    total=len;endY=at[1];bandTop=band_.t;bandBottom=band_.b;pageH=body.offsetHeight;
+    frame.style.height=pageH+"px";
     svg.setAttribute("width",W);svg.setAttribute("height",pageH);
-    svg.style.setProperty("--hair",hair);
+    svg.style.strokeWidth=hair;
 
     // the strokes: the hairline itself, then the rules it inks on its way (the rail, each
     // receipt rule, the contact rule)
     while(svg.firstChild)svg.removeChild(svg.firstChild);
     strokes=[];
     pieces.forEach(function(s){stroke("",s.d,s.a,s.b-s.a)});
-    rule("",weight(getComputedStyle(nodes[0].parentNode,"::before").width),xrail,y0,xrail,n[n.length-1].t+n[0].h/2,0);
+    rule("",railW,xrail,y0,xrail,n[n.length-1].t+n[0].h/2,0);
     rows.forEach(function(k,j){k.rules.forEach(function(u){
       var from=j%2?u.r:u.l;
       rule(u.cls,u.w,from,k.at,j%2?u.l:u.r,k.at,along(from,k.y),true);
@@ -535,7 +543,11 @@ footer a:hover{color:var(--green)}
     root.classList.add("threaded");
     root.classList.toggle("threaded-card",!!side);
 
-    drawn=was*total;goal=Math.max(wasGoal*total,lenAt(pen()));
+    // The same width is the same route, re-fitted: the line carries over as a share of its
+    // length. A new width is a new route: the line is redrawn to where the reader is now.
+    if(W===laidW||!laidW){drawn=was*total;goal=Math.max(wasGoal*total,lenAt(pen()))}
+    else drawn=goal=wasGoal<1?lenAt(pen()):total;
+    laidW=W;
     draw();
     wake();
   }
@@ -581,8 +593,11 @@ footer a:hover{color:var(--green)}
 
   function wake(){if(drawn<goal&&!raf){last=0;raf=requestAnimationFrame(step)}}
 
-  // The line only ever grows: scrolling back up leaves it as it is.
+  // The line only ever grows: scrolling back up leaves it as it is. While the page is a
+  // different width from the one the route was fitted to, a rebuild is on its way and the
+  // old route says nothing true about the new page, so this waits for it.
   function follow(){
+    if(root.clientWidth!==laidW)return;
     var to=lenAt(pen());
     if(to>goal){goal=to;wake()}
   }
@@ -597,14 +612,15 @@ footer a:hover{color:var(--green)}
       try{fn(a)}catch(e){
         dead=1;
         root.classList.remove("threaded","threaded-card");
-        svg.style.display=tip.style.display="none";
+        frame.style.display="none";
         nodes.forEach(function(n){n.classList.remove("lit")});
       }
     };
   }
   layout=guard(layout);step=guard(step);follow=guard(follow);
 
-  new ResizeObserver(relay).observe(body);
+  // re-fitted in the same frame the page reflows, so an inked rule never sits off its heading
+  new ResizeObserver(layout).observe(body);
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(relay);
   window.addEventListener("load",relay);
   window.addEventListener("scroll",follow,{passive:true});
