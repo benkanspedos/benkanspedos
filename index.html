@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>if("IntersectionObserver"in window&&window.matchMedia&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("lines")</script>
 <title>Ben Kanspedos · Applied AI Consulting · Essential Concepts LLC</title>
 <meta name="description" content="Companies have AI now and little to show for it. I find where it actually pays off, build the workflows, and make them stick. Applied AI consulting by Ben Kanspedos, Essential Concepts LLC, Tucson AZ.">
 <meta property="og:title" content="Ben Kanspedos · Applied AI Consulting">
@@ -188,6 +189,106 @@ footer .wrap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
 footer p{font-family:"IBM Plex Mono",monospace;font-size:.78rem;letter-spacing:.06em;color:var(--faint)}
 footer a{color:var(--faint)}
 footer a:hover{color:var(--green)}
+
+/* line work
+   The page's own lines draw themselves once as each section arrives: the rail,
+   the receipt rules, the card outlines and the contact rule, plus an underline
+   that passes under the three verbs in the hero. All of it is scoped to screen
+   and to html.lines, which the head script sets only when motion is allowed, so
+   reduced motion, print and no-script get the page exactly as it was.
+   .go starts a line. .set marks it drawn and hands it back to the plain rules
+   above, so the settled page is the page without any of this. */
+@media screen and (prefers-reduced-motion:no-preference){
+  /* the two easings: a draw, and a pass (in and out again). The keyframes below repeat them as plain values. */
+  .lines{--draw:cubic-bezier(.45,0,.25,1);--pass:cubic-bezier(.65,0,.35,1)}
+
+  /* text keeps its fade-up; a block's lines are drawn instead of faded */
+  .lines .reveal{opacity:1;transform:none}
+  .lines .reveal>:not(.rail):not(svg){opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+  .lines .reveal.in>:not(.rail):not(svg){opacity:1;transform:none}
+
+  /* hero: an underline passes under each of the three verbs, once */
+  .lines .sub b{background:linear-gradient(var(--green),var(--green)) no-repeat 0 100%/0 2px}
+  .lines .sub b:last-of-type{background-image:linear-gradient(var(--clay),var(--clay))}
+  .lines .sub.go b{animation:pass 1.2s var(--pass) both}
+  .lines .sub.go b:nth-of-type(2){animation-delay:.3s}
+  .lines .sub.go b:nth-of-type(3){animation-delay:.6s}
+
+  /* rail: green runs from each node down to the next and closes its ring, then drains away and leaves the rail.
+     The sliding strip is the resting line stacked above the green one, so one slide draws and then drains. */
+  .lines .process:not(.set) .rail::before{content:none}
+  .lines .node:not(.set){border-color:transparent}
+  .seg{position:absolute;left:50%;top:1.05rem;bottom:-1.05rem;width:2px;transform:translateX(-50%);overflow:hidden;pointer-events:none}
+  .seg i{position:absolute;left:0;right:0;top:0;height:calc(200% + 3rem);background:linear-gradient(var(--mist) calc(50% - 1.5rem),var(--green) calc(50% + 1.5rem));transform:translateY(-100%)}
+  .ring{position:absolute;overflow:visible;pointer-events:none}
+  .ring path{stroke:var(--green);animation:draw .42s var(--draw) forwards}
+  .stick .ring path{stroke:var(--clay)}
+
+  /* receipts: one light line crosses the dark band and leaves the three rules behind it.
+     Each rule appears halfway through the pass, while the line covers it: keep its delay at half the pass. */
+  /* a receipt's text waits for its line (.go), not just for the scroll reveal (.in). All five classes are needed:
+     this has to outrank the generic .reveal.in rule above. */
+  .lines .receipt-grid .receipt.reveal:not(.go)>*{opacity:0;transform:translateY(14px)}
+  .lines .receipt:not(.set),.lines .receipt-grid:not(.set){position:relative}
+  .lines .receipt:not(.set) h3{border-top-color:transparent}
+  .lines .receipt:not(.set)::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--green);opacity:0}
+  .lines .receipt:last-child:not(.set)::before{background:var(--clay)}
+  .lines .receipt.go:not(.set)::before{opacity:1;transition:opacity 0s .6s}
+  .lines .receipt:not(.set)::after,.lines .receipt-grid:not(.set)::before{content:"";position:absolute;z-index:1;left:0;right:0;top:0;height:2px;background:linear-gradient(var(--paper),var(--paper)) no-repeat 0 100%/0 2px}
+  .lines .receipt.go::after{animation:pass 1.2s var(--pass) both}
+  .lines .receipt-grid.go::before{animation:pass 1.6s var(--pass) both}
+  /* stacked, each receipt has its own line; side by side, they share one across the band and follow it left to right */
+  @media(max-width:48rem){
+    .lines .receipt-grid:not(.set)::before{content:none}
+  }
+  @media not all and (max-width:48rem){
+    .lines .receipt:not(.set)::after{content:none}
+    .lines .receipt.go:not(.set)::before{transition-delay:.8s}
+    .lines .receipt-grid .receipt:nth-child(1)>*{transition-delay:.1s}
+    .lines .receipt-grid .receipt:nth-child(2)>*{transition-delay:.28s}
+    .lines .receipt-grid .receipt:nth-child(3)>*{transition-delay:.46s}
+  }
+
+  /* engagement cards: the outline is drawn in green and relaxes into the hairline as the fill arrives.
+     .rest draws under .ink, which spends its first 59% drawing, so the two times must stay matched. */
+  .lines .step{transition:background-color .5s ease}
+  .lines .step:not(.set){position:relative;border-color:transparent}
+  .lines .step:not(.fill){background-color:transparent}
+  .trace{position:absolute;left:-1px;top:-1px;overflow:visible;pointer-events:none}
+  .trace .rest{stroke:var(--mist);animation:draw .855s var(--draw) forwards}
+  .trace .ink{stroke:var(--green);animation:ink 1.45s forwards}
+  @media not all and (max-width:48rem){
+    .lines .step:nth-child(2) .trace path{animation-delay:.14s}
+    .lines .step:nth-child(3) .trace path{animation-delay:.28s}
+  }
+  /* an undrawn stroke sits a hair past its own length: at exactly 1, a sharp screen shows a speck at its start */
+  .ring path,.trace path{stroke-dasharray:1 2;stroke-dashoffset:1.01}
+
+  /* contact: the one rule extends from the left and stays */
+  .lines .contact .card:not(.set){position:relative;border-top-color:transparent}
+  .lines .contact .card:not(.set)::before{content:"";position:absolute;left:0;right:0;top:-3px;height:3px;background:var(--green);transform:scaleX(0);transform-origin:0 50%}
+  .lines .contact .card.go:not(.set)::before{transform:none;transition:transform .9s var(--draw)}
+}
+/* a line draws in from its start, holds, then leaves from its start */
+@keyframes pass{
+  0%{background-size:0 2px;background-position:0 100%}
+  42%{background-size:100% 2px;background-position:0 100%}
+  58%{background-size:100% 2px;background-position:100% 100%}
+  100%{background-size:0 2px;background-position:100% 100%}
+}
+/* the rail strip: green slides in over the gap, holds while the ring closes, then slides on and leaves the resting line */
+@keyframes run{
+  0%{transform:translateY(-100%);animation-timing-function:cubic-bezier(.45,0,.25,1)}
+  44%{transform:translateY(calc(-50% - 1.5rem))}
+  56%{transform:translateY(calc(-50% - 1.5rem));animation-timing-function:cubic-bezier(.65,0,.35,1)}
+  100%{transform:none}
+}
+@keyframes ink{
+  0%{stroke-dashoffset:1.01;animation-timing-function:cubic-bezier(.45,0,.25,1)}
+  59%{stroke-dashoffset:0;opacity:1}
+  100%{stroke-dashoffset:0;opacity:0}
+}
+@keyframes draw{to{stroke-dashoffset:0}}
 </style>
 </head>
 <body>
@@ -320,18 +421,163 @@ footer a:hover{color:var(--green)}
 
 <script>
 (function(){
-  var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var els=document.querySelectorAll(".reveal");
-  if(reduce||!("IntersectionObserver" in window)){
-    els.forEach(function(el){el.classList.add("in")});
-    return;
-  }
-  var io=new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}
+  var doc=document,root=doc.documentElement;
+  function all(sel){return [].slice.call(doc.querySelectorAll(sel))}
+  var els=all(".reveal");
+  function showAll(){els.forEach(function(el){el.classList.add("in")})}
+  // html.lines is absent under reduced motion or without IntersectionObserver:
+  // show everything at once, as the page always has.
+  if(!root.classList.contains("lines")){showAll();return}
+
+  // If the line work ever throws, fall back to the plain page instead of leaving anything hidden.
+  function bail(){root.classList.remove("lines");showAll()}
+  function safe(fn){return function(){try{return fn.apply(this,arguments)}catch(err){bail()}}}
+
+  safe(function(){
+    function svg(tag,attrs){
+      var el=doc.createElementNS("http://www.w3.org/2000/svg",tag);
+      for(var k in attrs)el.setAttribute(k,attrs[k]);
+      return el;
+    }
+    function overlay(cls,w,h){return svg("svg",{"class":cls,width:w,height:h,"aria-hidden":"true"})}
+    // A drawable stroke. pathLength 1 lets one dash stand for the whole line. fill is an attribute, not a style,
+    // so the shape can never show filled if the stylesheet stops applying mid-draw.
+    function stroke(d,cls){return svg("path",{d:d,"class":cls||"",pathLength:1,fill:"none"})}
+    // .set hands a drawn line back to its plain rule in the stylesheet
+    function settle(el){el.classList.add("set")}
+
+    /* rail: one drawable segment per gap between nodes, hung from the upper node's rail */
+    var nodes=all(".node");
+    var segs=nodes.slice(0,-1).map(function(n){
+      var seg=doc.createElement("span");
+      seg.className="seg";seg.setAttribute("aria-hidden","true");seg.appendChild(doc.createElement("i"));
+      return n.parentNode.appendChild(seg);
     });
-  },{threshold:.18});
-  els.forEach(function(el){io.observe(el)});
+    var state=nodes.map(function(){return 0}),waiting=[]; // per node: 0 idle, 1 drawing, 2 drawn
+    var sliding=0; // segments still drawing or draining
+    // the rail goes back to the real one only when every ring is closed and every segment has finished draining
+    function finish(){
+      if(sliding||!state.every(function(v){return v===2}))return;
+      settle(doc.querySelector(".process"));
+      segs.forEach(function(seg){seg.remove()});
+    }
+
+    // close node i's ring from the top, both ways round, after `wait` seconds
+    function ring(i,wait){
+      var n=nodes[i],size=n.offsetWidth,bw=n.clientLeft,c=size/2,r=c-bw/2,s=overlay("ring",size,size);
+      s.style.cssText="left:-"+bw+"px;top:-"+bw+"px";
+      [1,0].forEach(function(side){
+        var half=stroke("M"+c+" "+bw/2+"A"+r+" "+r+" 0 0 "+side+" "+c+" "+(size-bw/2));
+        half.style.cssText="stroke-width:"+bw+"px;animation-delay:"+wait+"s";
+        s.appendChild(half);
+      });
+      s.lastChild.addEventListener("animationend",safe(function(){
+        settle(n);s.remove();state[i]=2;
+        if(waiting[i+1])arrive(i+1);
+        finish();
+      }));
+      n.appendChild(s);
+    }
+    function arrive(i){
+      if(state[i])return;
+      // wait while the node above is drawing, or is itself queued behind its own, so the three always close in order
+      if(i&&(state[i-1]===1||waiting[i-1])){waiting[i]=1;return}
+      waiting[i]=0;state[i]=1;
+      if(!i)return ring(0,0);
+      // run spends 44% of its length drawing down to the node: about 620px a second, held between .5s and .8s
+      var draw=Math.min(.8,Math.max(.5,segs[i-1].offsetHeight/620)),line=segs[i-1].firstChild;
+      sliding++;
+      line.addEventListener("animationend",safe(function(){sliding--;finish()}));
+      line.style.animation="run "+draw/.44+"s forwards";
+      ring(i,draw-.07); // the ring starts as the line touches it
+    }
+
+    /* engagement cards: the 1px border as one path along its center line, clockwise from the top-left corner */
+    function trace(card){
+      var box=card.getBoundingClientRect(),s=overlay("trace",box.width,box.height);
+      var x=box.width-.5,y=box.height-.5,r=parseFloat(getComputedStyle(card).borderTopLeftRadius)-.5,arc="A"+r+" "+r+" 0 0 1 ";
+      var d="M"+(r+.5)+" .5H"+(x-r)+arc+x+" "+(r+.5)+"V"+(y-r)+arc+(x-r)+" "+y+"H"+(r+.5)+arc+".5 "+(y-r)+"V"+(r+.5)+arc+(r+.5)+" .5Z";
+      function outline(cls,done){s.appendChild(stroke(d,cls)).addEventListener("animationend",safe(done))}
+      outline("rest",function(){card.classList.add("fill")});
+      outline("ink",function(){settle(card);s.remove()});
+      card.appendChild(s);
+    }
+
+    /* receipts and contact: their lines are all CSS, so they only need starting and handing back */
+    var grid=doc.querySelector(".receipt-grid"),receipts=all(".receipt"),cards=all(".step"),contact=doc.querySelector(".contact .card");
+    doc.addEventListener("animationend",safe(function(e){
+      if(e.animationName!=="pass")return;
+      if(e.target===grid){ // the shared line, side by side
+        settle(grid);
+        receipts.forEach(function(r){r.classList.add("go");settle(r)});
+      }else if(e.target.parentNode===grid){ // a receipt's own line, stacked
+        settle(e.target);
+        // once all three have drawn, settle the grid too, so turning the phone cannot replay the shared line
+        if(receipts.every(function(r){return r.classList.contains("set")}))settle(grid);
+      }
+    }));
+    doc.addEventListener("transitionend",safe(function(e){
+      if(e.target===contact&&e.pseudoElement==="::before")settle(contact);
+    }));
+
+    // text fades up as it always has, as soon as a block starts to show (a receipt's also waits for its line)
+    var io=new IntersectionObserver(safe(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}
+      });
+    }),{threshold:.18});
+    els.forEach(function(el){io.observe(el)});
+
+    // A line starts later than its text: once its top edge is `inset` percent of the viewport above the bottom
+    // edge, so the draw happens in view and not at the fold.
+    var lines=nodes.concat(receipts,cards,contact),begun=[];
+    function begin(el){
+      if(begun.indexOf(el)>-1)return;
+      begun.push(el);
+      var i=nodes.indexOf(el);
+      if(i>-1)arrive(i);
+      else if(cards.indexOf(el)>-1)trace(el);
+      else{el.classList.add("go");if(el.parentNode===grid)grid.classList.add("go")}
+    }
+    function watch(el,inset){
+      var o=new IntersectionObserver(safe(function(entries){
+        if(entries.some(function(e){return e.isIntersecting})){o.disconnect();begin(el)}
+      }),{rootMargin:"0px 0px -"+Math.min(80,inset)+"% 0px"});
+      o.observe(el);
+    }
+    function share(el){return 100*el.offsetHeight/window.innerHeight} // its height as a percent of the viewport's
+    // The lines start watching at the first scroll, or once the hero's underlines have had their turn,
+    // so a first node already on screen at load draws after the hero instead of during the first paint.
+    var started=0;
+    function start(){
+      if(started)return;
+      started=1;
+      nodes.concat(contact).forEach(function(el){watch(el,15)}); // a node or the contact rule, 15% up
+      receipts.forEach(function(el){watch(el,share(el)+5)}); // a receipt, wholly in view
+      cards.forEach(function(el){watch(el,.6*share(el)+15)}); // a card, most of it in view
+      // at the foot of the page, start whatever is on screen but was never brought that far up
+      var foot=new IntersectionObserver(safe(function(entries){
+        if(!entries.some(function(e){return e.isIntersecting}))return;
+        foot.disconnect();
+        lines.forEach(function(el){if(el.getBoundingClientRect().bottom>0)begin(el)});
+      }),{threshold:1});
+      foot.observe(doc.querySelector("footer"));
+    }
+    if(window.scrollY)start();
+    else window.addEventListener("scroll",safe(start),{once:true,passive:true});
+
+    /* hero: wait for the webfonts so each underline fits its word, and for the tab to be showing */
+    var sub=doc.querySelector(".hero .sub"),swept=0;
+    function sweep(){
+      if(swept)return;
+      if(doc.hidden){doc.addEventListener("visibilitychange",sweep,{once:true});return}
+      swept=1;
+      setTimeout(function(){sub.classList.add("go")},400);
+      setTimeout(safe(start),1700);
+    }
+    if(doc.fonts&&doc.fonts.ready)doc.fonts.ready.then(sweep);
+    setTimeout(sweep,1500);
+  })();
 })();
 </script>
 
