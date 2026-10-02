@@ -9,7 +9,7 @@ A single static page. No framework, no build step, no dependencies beyond Google
 
 | File | Purpose |
 |---|---|
-| `index.html` | The entire site. Inline CSS and one small IntersectionObserver script. |
+| `index.html` | The entire site. Inline CSS and one inline script: the scroll reveals and the line work. |
 | `DESIGN.md` | The binding design contract: palette, type, signature element, voice rules. |
 | `netlify.toml` | Deploy config. Publish directory is the repo root. |
 

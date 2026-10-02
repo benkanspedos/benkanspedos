@@ -35,7 +35,17 @@ The FIND -> BUILD -> STICK left rail: vertical 2px mist line, 1rem nodes bordere
 
 ## Motion
 
-Scroll reveals (.reveal -> .in via IntersectionObserver) only. prefers-reduced-motion: everything visible, no transitions. No parallax, no gradient animation.
+Two things move: text fades up as it always has (.reveal -> .in via IntersectionObserver), and the page's own lines draw themselves once as each section arrives, then stay still.
+
+- Hero: a 2px underline passes under find, build, make them stick (green, green, clay) and leaves nothing behind.
+- Rail: green runs from each node down to the next, the ring closes (clay at Stick), then the green drains and leaves the mist line.
+- Receipts: one paper-colored line crosses the dark band and leaves the three rules behind it. This is the one bright moment. Nothing else competes with it.
+- Engagement cards: each outline is drawn in green and relaxes into the mist hairline as the fill arrives.
+- Contact: the green rule extends from the left and stays.
+
+Rules for any line work: hairlines only, and only lines the page already has (the hero underline is the one stroke with no resting element, and it does not persist). Each draws once, on arrival, and never replays. The settled page must be pixel-identical to the page with no motion at all. Easing is cubic-bezier(.45,0,.25,1) for a draw and cubic-bezier(.65,0,.35,1) for a pass, 0.4s to 1.6s.
+
+prefers-reduced-motion, print and no-script: everything visible, nothing drawn, no transitions. No parallax, no scroll-linked movement, no loops, no animated gradient surfaces.
 
 ## Quality floor
 
