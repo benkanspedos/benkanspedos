@@ -142,6 +142,8 @@ h2{
 .reveal{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
 .reveal.in{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+/* a printed page was never scrolled, so nothing below the fold has been revealed yet: show it all */
+@media print{.reveal{opacity:1;transform:none}}
 
 /* receipts */
 .receipts{background:var(--ink);color:var(--paper);padding:4.5rem 0}
@@ -228,6 +230,7 @@ footer a:hover{color:var(--green)}
 }
 @media print{.thread-box,.node::after{display:none}}
 </style>
+<noscript><style>/* no script means nothing ever adds .in, so show the revealed blocks outright */.reveal{opacity:1;transform:none}</style></noscript>
 </head>
 <body>
 
