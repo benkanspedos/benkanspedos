@@ -188,6 +188,45 @@ footer .wrap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
 footer p{font-family:"IBM Plex Mono",monospace;font-size:.78rem;letter-spacing:.06em;color:var(--faint)}
 footer a{color:var(--faint)}
 footer a:hover{color:var(--green)}
+
+/* thread: one hairline drawn down the page on scroll, stringing the page's own rules
+   together. The script at the end of the page builds it, and only when motion is allowed,
+   so without it every rule above stays static. */
+/* One box holds the whole drawing, and its width is the page's own. Nothing inside it can
+   push the page wider than the screen, which on a rotated phone would shrink the whole
+   page to fit until the drawing was rebuilt. */
+.thread-box{position:absolute;top:0;left:0;right:0;overflow:hidden;pointer-events:none}
+.thread,.thread-tip{position:absolute;top:0;left:0}
+.thread path{fill:none;stroke:var(--green);stroke-linecap:round}
+/* where the thread runs along one of the page's rules, the rule is inked at its own weight
+   (read from the rule itself by the script) and in its own colour */
+.thread .rule{stroke-linecap:butt}
+.thread .clay{stroke:var(--clay)}
+/* the one flourish: on the dark band each receipt rule arrives lit, then settles to its own colour */
+.thread .fresh{animation:thread-settle 1.8s ease-in-out}
+@keyframes thread-settle{0%,20%{stroke:var(--paper)}}
+/* the point the thread is being drawn from: the same dot that fills each rail node. It has
+   its own layer, so moving it costs no repaint. */
+.thread-tip{width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:var(--green);opacity:0;transition:opacity .4s ease;will-change:transform}
+.thread-tip.on{opacity:1}
+.thread-tip.ink{background:var(--paper)}
+.node::after{
+  content:"";
+  position:absolute;inset:2px;
+  border-radius:50%;
+  background:var(--green);
+  transform:scale(0);
+  transition:transform .3s ease;
+}
+.stage.stick .node::after{background:var(--clay)}
+.node.lit::after{transform:scale(1)}
+@media screen{
+  /* the thread inks these rules itself */
+  .threaded .receipts .receipt h3,.threaded-card .contact .card{border-top-color:transparent}
+  /* the thread ends at this button: keep the button's focus ring above it */
+  .threaded .contact .btn{position:relative;z-index:1}
+}
+@media print{.thread-box,.node::after{display:none}}
 </style>
 </head>
 <body>
@@ -332,6 +371,261 @@ footer a:hover{color:var(--green)}
     });
   },{threshold:.18});
   els.forEach(function(el){io.observe(el)});
+})();
+</script>
+
+<script>
+/* Thread: one continuous hairline, drawn as the page is scrolled and never undrawn. It
+   runs down the FIND / BUILD / STICK rail, through the receipt rules and the contact rule,
+   and ends at the email button, inking each of those rules as it passes. Reduced motion
+   never builds it: that visitor gets the static page. */
+(function(){
+  if(window.matchMedia("(prefers-reduced-motion: reduce), (forced-colors: active)").matches||!("ResizeObserver" in window))return;
+  var root=document.documentElement,body=document.body,
+      nodes=document.querySelectorAll(".process .node"),
+      rules=document.querySelectorAll(".receipt h3"),
+      band=document.querySelector(".receipts"),
+      card=document.querySelector(".contact .card"),
+      btn=document.querySelector(".contact .btn");
+  if(nodes.length<2||!rules.length||!band||!card||!btn)return;
+
+  var HAIR=1,    // px: the thread's weight, before it is fitted to whole device pixels
+      PEN=.72,   // how far down the viewport the line has been drawn
+      TAU=.1,    // seconds the line trails the scroll by
+      ACC=4000,  // px/s2: eases the line into a long run
+      VMAX=1200, // px/s: keeps a full-width run deliberate
+      VMIN=90;   // px/s: no endless tail when it settles
+
+  var NS="http://www.w3.org/2000/svg";
+  function make(tag,cls){var e=document.createElementNS(NS,tag);if(cls)e.setAttribute("class",cls);return e}
+  var frame=document.createElement("div"),svg=make("svg","thread"),tip=document.createElement("i");
+  frame.className="thread-box";
+  frame.setAttribute("aria-hidden","true");
+  frame.appendChild(svg);frame.appendChild(tip);
+  body.appendChild(frame);
+
+  var pieces=[],strokes=[],marks=[],total=0,endY=0,pageH=0,laidW=0,bandTop=0,bandBottom=0,
+      drawn=0,goal=0,vel=0,raf=0,last=0,queued=0,lit=0,dead=0,tipClass="";
+  function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v))}
+
+  // An element's box in page space, as laid out: the reveal offset is taken back out.
+  function box(e){
+    var r=e.getBoundingClientRect(),p=e.closest(".reveal"),dy=0;
+    if(p){var t=getComputedStyle(p).transform;if(t&&t!=="none")dy=new DOMMatrixReadOnly(t).m42}
+    return{l:r.left+window.scrollX,r:r.right+window.scrollX,t:r.top+window.scrollY-dy,b:r.bottom+window.scrollY-dy,w:r.width,h:r.height};
+  }
+
+  // How much of the line lies above a height on the page. The route never climbs, and a
+  // level run counts whole as soon as its height is reached.
+  function lenAt(y){
+    var l=0;
+    for(var i=0;i<pieces.length;i++){
+      var s=pieces[i];
+      if(y>=s.y1){l=s.b;continue}
+      if(y>s.y0)l=s.a+(s.b-s.a)*(y-s.y0)/(s.y1-s.y0);
+      break;
+    }
+    return l;
+  }
+
+  // Where the line has got to, worked out from the route itself so the frame loop never
+  // has to ask the browser to measure anything.
+  function pointAt(l){
+    for(var i=0;i<pieces.length;i++){
+      var s=pieces[i];
+      if(l>s.b&&i<pieces.length-1)continue;
+      var f=clamp((l-s.a)/(s.b-s.a),0,1);
+      if(!s.arc)return[s.x0+(s.x1-s.x0)*f,s.y0+(s.y1-s.y0)*f];
+      var c=Math.cos(f*Math.PI/2)*s.arc,n=Math.sin(f*Math.PI/2)*s.arc;
+      return[s.x0+s.vx*(s.arc-c)+s.ux*n,s.y0+s.vy*(s.arc-c)+s.uy*n];
+    }
+    return[0,0];
+  }
+
+  // Length of line before a point on one of its level runs.
+  function along(x,y){
+    for(var i=0;i<pieces.length;i++){
+      var s=pieces[i];
+      if(!s.arc&&s.y0===s.y1&&Math.abs(s.y0-y)<.01)
+        return s.a+Math.abs(clamp(x,Math.min(s.x0,s.x1),Math.max(s.x0,s.x1))-s.x0);
+    }
+    return 0;
+  }
+
+  // One stroke of the drawing: where along the thread it starts and how long it is. The
+  // thread is a stroke per piece of its route, so a frame repaints only the piece being
+  // drawn, plus a stroke for each of the page's own rules it inks on the way.
+  function stroke(cls,d,a,len,lights){
+    var e=make("path",cls);
+    e.setAttribute("d",d);
+    svg.appendChild(e);
+    strokes.push({e:e,a:a,len:len,v:-1,lights:lights});
+    return e;
+  }
+  function rule(cls,w,x1,y1,x2,y2,a,lights){
+    stroke("rule "+cls,"M"+x1+" "+y1+"L"+x2+" "+y2,a,Math.abs(x2-x1)+Math.abs(y2-y1),lights).style.strokeWidth=w;
+  }
+
+  function layout(){
+    var dpr=window.devicePixelRatio||1,W=root.clientWidth,
+        was=total?drawn/total:0,wasGoal=total?goal/total:0;
+    // a line's weight as the browser paints a border: whole device pixels, never less than one
+    function weight(v){return Math.max(1,Math.floor(parseFloat(v)*dpr+.01))/dpr}
+    // nearest place on the device pixel grid for an edge, and for the middle of the hairline
+    function snap(v){return Math.round(v*dpr)/dpr}
+    function mid(v){return Math.round(hair*dpr)%2?snap(v-.5/dpr)+.5/dpr:snap(v)}
+    var hair=weight(HAIR),
+        n=[].map.call(nodes,box),c=box(card),b=box(btn),band_=box(band),
+        gut=Math.min(32,c.l/2), // every corner lives in the page margin
+        xl=mid(c.l-gut),xr=mid(W-c.l+gut),
+        xrail=snap(n[0].l)+n[0].w/2,xn=mid(xrail),y0=n[0].t+n[0].h/2,
+        railW=weight(getComputedStyle(nodes[0].parentNode,"::before").width),
+        yj=mid((box(nodes[nodes.length-1].closest(".stage")).b+band_.t)/2),
+        pts=[[xn,y0],[xn,yj],[xl,yj]],rows=[],side=0;
+
+    // the receipt rules, row by row, swept in alternate directions
+    rules.forEach(function(h,i){
+      var r=box(h),w=weight(getComputedStyle(h).borderTopWidth),y=snap(r.t)+w/2,k=rows[rows.length-1];
+      if(!k||Math.abs(k.at-y)>1)rows.push(k={at:y,y:mid(y),rules:[]});
+      k.rules.push({l:r.l,r:r.r,w:w,cls:i===rules.length-1?"clay":""});
+    });
+    rows.forEach(function(k){pts.push([side?xr:xl,k.y]);side^=1;pts.push([side?xr:xl,k.y])});
+
+    // the contact rule, then down to the email button (only while the button is the first
+    // thing on its row: with anything to its left the line would have to cross it)
+    var barW=weight(getComputedStyle(card).borderTopWidth),bar=snap(c.t)+barW/2,yc=mid(bar),yb=b.t+b.h/2;
+    pts.push([side?xr:xl,yc]);
+    if(side)pts.push([xl,yc]);
+    if(Math.abs(b.l-c.l)<1)pts.push([xl,yb],[b.l,yb]);
+
+    // the route in pieces, straight runs and quarter-turn corners, each with its place
+    // along the thread so the scroll can be mapped onto it
+    var len=0,at=pts[0];
+    pieces=[];
+    function run(x,y,rad,ux,uy,vx,vy,cw){
+      var l=rad?Math.PI*rad/2:Math.abs(x-at[0])+Math.abs(y-at[1]);
+      if(l>.01){
+        pieces.push({a:len,b:len+l,x0:at[0],y0:at[1],x1:x,y1:y,arc:rad||0,ux:ux,uy:uy,vx:vx,vy:vy,
+          d:"M"+at[0]+" "+at[1]+(rad?"A"+rad+" "+rad+" 0 0 "+cw+" ":"L")+x+" "+y});
+        len+=l;
+      }
+      at=[x,y];
+    }
+    for(var i=1;i<pts.length;i++){
+      var o=pts[i-1],p=pts[i],q=pts[i+1],
+          din=Math.abs(p[0]-o[0])+Math.abs(p[1]-o[1]),
+          dout=q?Math.abs(q[0]-p[0])+Math.abs(q[1]-p[1]):0;
+      if(!din)continue;
+      var ux=(p[0]-o[0])/din,uy=(p[1]-o[1])/din,vx=dout?(q[0]-p[0])/dout:ux,vy=dout?(q[1]-p[1])/dout:uy,
+          turn=ux*vy-uy*vx,
+          rad=Math.min(gut,i>1?din/2:din,i<pts.length-2?dout/2:dout);
+      if(!turn||rad<.5){run(p[0],p[1]);continue}
+      run(p[0]-ux*rad,p[1]-uy*rad);
+      run(p[0]+vx*rad,p[1]+vy*rad,rad,ux,uy,vx,vy,turn>0?1:0);
+    }
+    total=len;endY=at[1];bandTop=band_.t;bandBottom=band_.b;pageH=body.offsetHeight;
+    frame.style.height=pageH+"px";
+    svg.setAttribute("width",W);svg.setAttribute("height",pageH);
+    svg.style.strokeWidth=hair;
+
+    // the strokes: the hairline itself, then the rules it inks on its way (the rail, each
+    // receipt rule, the contact rule)
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+    strokes=[];
+    pieces.forEach(function(s){stroke("",s.d,s.a,s.b-s.a)});
+    rule("",railW,xrail,y0,xrail,n[n.length-1].t+n[0].h/2,0);
+    rows.forEach(function(k,j){k.rules.forEach(function(u){
+      var from=j%2?u.r:u.l;
+      rule(u.cls,u.w,from,k.at,j%2?u.l:u.r,k.at,along(from,k.y),true);
+    })});
+    if(side)rule("",barW,c.r,bar,c.l,bar,along(c.r,yc));
+    marks=n.map(function(m,i){return{e:nodes[i],at:Math.max(0,m.t-n[0].t-m.h/2)}});
+    root.classList.add("threaded");
+    root.classList.toggle("threaded-card",!!side);
+
+    // The same width is the same route, re-fitted: the line carries over as a share of its
+    // length. A new width is a new route: the line is redrawn to where the reader is now.
+    if(W===laidW||!laidW){drawn=was*total;goal=Math.max(wasGoal*total,lenAt(pen()))}
+    else drawn=goal=wasGoal<1?lenAt(pen()):total;
+    laidW=W;
+    draw();
+    wake();
+  }
+
+  // The height on the page the line should have reached: a fixed way down the viewport,
+  // pulled forward over the last screen so the line always arrives at the button.
+  function pen(){
+    var vh=window.innerHeight,sy=window.scrollY,max=Math.max(1,pageH-vh),
+        y=sy+vh*PEN,shy=endY+4-(max+vh*PEN);
+    if(shy>0)y+=shy*clamp((sy-max+vh)/vh,0,1);
+    return y;
+  }
+
+  // Writes only, and only to what changed: a dash length on the stroke being drawn (and on
+  // a rule being inked alongside it), and a transform for the tip.
+  function draw(){
+    strokes.forEach(function(o){
+      var v=clamp(drawn-o.a,0,o.len);
+      if(v===o.v)return;
+      // lit only when it is drawn in view: a rule inked whole in one frame was skipped past
+      if(o.lights&&!o.v&&v&&v<o.len)o.e.classList.add("fresh");
+      if(!o.v!==!v)o.e.style.visibility=v?"visible":"hidden";
+      o.v=v;
+      o.e.style.strokeDasharray=v<o.len?v+" "+(o.len+9):"none";
+    });
+    while(lit<marks.length&&drawn>marks[lit].at)marks[lit++].e.classList.add("lit");
+    var p=pointAt(drawn),
+        cls="thread-tip"+(drawn&&drawn<total?" on":"")+(p[1]>bandTop&&p[1]<bandBottom?" ink":"");
+    tip.style.transform="translate("+p[0]+"px,"+p[1]+"px)";
+    if(cls!==tipClass)tip.className=tipClass=cls;
+  }
+
+  function step(now){
+    var dt=last?Math.min(.05,(now-last)/1000):1/60;last=now;
+    // line already above the viewport is not worth animating
+    drawn=Math.max(drawn,Math.min(goal,lenAt(window.scrollY-24)));
+    vel=Math.min(Math.max((goal-drawn)/TAU,VMIN),vel+ACC*dt,VMAX);
+    drawn+=vel*dt;
+    if(goal-drawn<.5){drawn=goal;vel=0}
+    draw();
+    raf=drawn<goal?requestAnimationFrame(step):0;
+  }
+
+  function wake(){if(drawn<goal&&!raf){last=0;raf=requestAnimationFrame(step)}}
+
+  // The line only ever grows: scrolling back up leaves it as it is. While the page is a
+  // different width from the one the route was fitted to, a rebuild is on its way and the
+  // old route says nothing true about the new page, so this waits for it.
+  function follow(){
+    if(root.clientWidth!==laidW)return;
+    var to=lenAt(pen());
+    if(to>goal){goal=to;wake()}
+  }
+
+  function relay(){if(!queued)queued=requestAnimationFrame(function(){queued=0;layout()})}
+
+  // If any of this ever throws, the thread steps aside for good and the page keeps its own
+  // static rules: nothing is left hidden or half-drawn.
+  function guard(fn){
+    return function(a){
+      if(dead)return;
+      try{fn(a)}catch(e){
+        dead=1;
+        root.classList.remove("threaded","threaded-card");
+        frame.style.display="none";
+        nodes.forEach(function(n){n.classList.remove("lit")});
+      }
+    };
+  }
+  layout=guard(layout);step=guard(step);follow=guard(follow);
+
+  // re-fitted in the same frame the page reflows, so an inked rule never sits off its heading
+  new ResizeObserver(layout).observe(body);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(relay);
+  window.addEventListener("load",relay);
+  window.addEventListener("scroll",follow,{passive:true});
+  window.addEventListener("resize",follow);
+  layout();
 })();
 </script>
 

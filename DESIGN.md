@@ -35,7 +35,14 @@ The FIND -> BUILD -> STICK left rail: vertical 2px mist line, 1rem nodes bordere
 
 ## Motion
 
-Scroll reveals (.reveal -> .in via IntersectionObserver) only. prefers-reduced-motion: everything visible, no transitions. No parallax, no gradient animation.
+Two things move. Nothing else does.
+
+- Scroll reveals (.reveal -> .in via IntersectionObserver).
+- The thread: one 1px green hairline, drawn down the page as it is scrolled and never undrawn, led by a 6px dot (green, paper on the dark band) that goes when the line is complete. It starts at the Find node and turns the rail green (each node takes a 6px centre dot as the thread reaches it), steps out to the page margin, inks the receipt rules, runs down the far margin, inks the contact rule and ends at the email button. Where the receipts stack (768px and under) it snakes through them, one rule per pass. Every rule it reaches is inked at that rule's own weight and colour, so the finished page is the static page plus the hairline, a green rail and dotted nodes. Corners sit in the page margin or under the rail, never over text.
+
+One flourish, and only one: on the dark band each receipt rule arrives lit in paper as it is drawn, then settles to its own colour.
+
+prefers-reduced-motion (and forced colours): the thread is never built. Everything visible, no transitions, the static page as designed. If the thread's script ever fails it hides itself and the static rules return. No parallax, no gradient animation.
 
 ## Quality floor
 
