@@ -192,6 +192,8 @@ footer a:hover{color:var(--green)}
 /* thread: one hairline drawn down the page on scroll, stringing the page's own rules
    together. The script at the end of the page builds it, and only when motion is allowed,
    so without it every rule above stays static. */
+/* each on its own layer: the tip moves without a repaint, and redrawing a stroke never
+   repaints the page beneath it */
 .thread,.thread-tip{position:absolute;top:0;left:0;pointer-events:none;will-change:transform}
 .thread{--hair:1}
 .thread path{fill:none;stroke:var(--green);stroke-width:var(--hair);stroke-linecap:round}
@@ -398,7 +400,7 @@ footer a:hover{color:var(--green)}
 
   var HAIR=parseFloat(getComputedStyle(svg).getPropertyValue("--hair"))||1,
       pieces=[],strokes=[],marks=[],total=0,endY=0,pageH=0,bandTop=0,bandBottom=0,
-      drawn=0,goal=0,vel=0,raf=0,last=0,queued=0,lit=0,tipClass="";
+      drawn=0,goal=0,vel=0,raf=0,last=0,queued=0,lit=0,dead=0,tipClass="";
   function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v))}
 
   // An element's box in page space, as laid out: the reveal offset is taken back out.
@@ -553,7 +555,8 @@ footer a:hover{color:var(--green)}
     strokes.forEach(function(o){
       var v=clamp(drawn-o.a,0,o.len);
       if(v===o.v)return;
-      if(o.lights&&!o.v&&v)o.e.classList.add("fresh");
+      // lit only when it is drawn in view: a rule inked whole in one frame was skipped past
+      if(o.lights&&!o.v&&v&&v<o.len)o.e.classList.add("fresh");
       if(!o.v!==!v)o.e.style.visibility=v?"visible":"hidden";
       o.v=v;
       o.e.style.strokeDasharray=v<o.len?v+" "+(o.len+9):"none";
@@ -585,6 +588,21 @@ footer a:hover{color:var(--green)}
   }
 
   function relay(){if(!queued)queued=requestAnimationFrame(function(){queued=0;layout()})}
+
+  // If any of this ever throws, the thread steps aside for good and the page keeps its own
+  // static rules: nothing is left hidden or half-drawn.
+  function guard(fn){
+    return function(a){
+      if(dead)return;
+      try{fn(a)}catch(e){
+        dead=1;
+        root.classList.remove("threaded","threaded-card");
+        svg.style.display=tip.style.display="none";
+        nodes.forEach(function(n){n.classList.remove("lit")});
+      }
+    };
+  }
+  layout=guard(layout);step=guard(step);follow=guard(follow);
 
   new ResizeObserver(relay).observe(body);
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(relay);
