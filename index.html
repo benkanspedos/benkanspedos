@@ -399,6 +399,7 @@ footer a:hover{color:var(--green)}
   var HAIR=parseFloat(getComputedStyle(svg).getPropertyValue("--hair"))||1,
       pieces=[],strokes=[],marks=[],total=0,endY=0,pageH=0,bandTop=0,bandBottom=0,
       drawn=0,goal=0,vel=0,raf=0,last=0,queued=0,lit=0,tipClass="";
+  function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v))}
 
   // An element's box in page space, as laid out: the reveal offset is taken back out.
   function box(e){
@@ -426,7 +427,7 @@ footer a:hover{color:var(--green)}
     for(var i=0;i<pieces.length;i++){
       var s=pieces[i];
       if(l>s.b&&i<pieces.length-1)continue;
-      var f=Math.max(0,Math.min(1,(l-s.a)/(s.b-s.a)));
+      var f=clamp((l-s.a)/(s.b-s.a),0,1);
       if(!s.arc)return[s.x0+(s.x1-s.x0)*f,s.y0+(s.y1-s.y0)*f];
       var c=Math.cos(f*Math.PI/2)*s.arc,n=Math.sin(f*Math.PI/2)*s.arc;
       return[s.x0+s.vx*(s.arc-c)+s.ux*n,s.y0+s.vy*(s.arc-c)+s.uy*n];
@@ -439,7 +440,7 @@ footer a:hover{color:var(--green)}
     for(var i=0;i<pieces.length;i++){
       var s=pieces[i];
       if(!s.arc&&s.y0===s.y1&&Math.abs(s.y0-y)<.01)
-        return s.a+Math.abs(Math.max(Math.min(s.x0,s.x1),Math.min(Math.max(s.x0,s.x1),x))-s.x0);
+        return s.a+Math.abs(clamp(x,Math.min(s.x0,s.x1),Math.max(s.x0,s.x1))-s.x0);
     }
     return 0;
   }
@@ -475,7 +476,7 @@ footer a:hover{color:var(--green)}
         pts=[[xn,y0],[xn,yj],[xl,yj]],rows=[],side=0;
 
     // the receipt rules, row by row, swept in alternate directions
-    [].forEach.call(rules,function(h,i){
+    rules.forEach(function(h,i){
       var r=box(h),w=weight(getComputedStyle(h).borderTopWidth),y=snap(r.t)+w/2,k=rows[rows.length-1];
       if(!k||Math.abs(k.at-y)>1)rows.push(k={at:y,y:mid(y),rules:[]});
       k.rules.push({l:r.l,r:r.r,w:w,cls:i===rules.length-1?"clay":""});
@@ -542,7 +543,7 @@ footer a:hover{color:var(--green)}
   function pen(){
     var vh=window.innerHeight,sy=window.scrollY,max=Math.max(1,pageH-vh),
         y=sy+vh*PEN,shy=endY+4-(max+vh*PEN);
-    if(shy>0)y+=shy*Math.max(0,Math.min(1,(sy-max+vh)/vh));
+    if(shy>0)y+=shy*clamp((sy-max+vh)/vh,0,1);
     return y;
   }
 
@@ -550,9 +551,9 @@ footer a:hover{color:var(--green)}
   // a rule being inked alongside it), and a transform for the tip.
   function draw(){
     strokes.forEach(function(o){
-      var v=Math.max(0,Math.min(o.len,drawn-o.a));
+      var v=clamp(drawn-o.a,0,o.len);
       if(v===o.v)return;
-      if(o.lights&&!o.v&&v)o.e.setAttribute("class",o.e.getAttribute("class")+" fresh");
+      if(o.lights&&!o.v&&v)o.e.classList.add("fresh");
       if(!o.v!==!v)o.e.style.visibility=v?"visible":"hidden";
       o.v=v;
       o.e.style.strokeDasharray=v<o.len?v+" "+(o.len+9):"none";
